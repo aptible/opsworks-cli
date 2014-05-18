@@ -1,0 +1,13 @@
+require 'spec_helper'
+
+describe OpsWorks::CLI::Agent do
+  before { subject.stub(:ask) }
+
+  describe '#version' do
+    it 'should print the version' do
+      version = OpsWorks::CLI::VERSION
+      expect(STDOUT).to receive(:puts).with "opsworks-cli v#{version}"
+      subject.version
+    end
+  end
+end

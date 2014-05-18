@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+begin
+  require 'opsworks/cli'
+rescue
+  require 'rubygems'
+  require 'opsworks/cli'
+end
+
+OpsWorks::CLI::Agent.start

@@ -1,7 +1,7 @@
 require 'opsworks/cli/version'
+require 'opsworks/cli/agent'
 
-module Opsworks
-  module Cli
-    # Your code goes here...
+module OpsWorks
+  module CLI
   end
 end
