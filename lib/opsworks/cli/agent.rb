@@ -25,7 +25,7 @@ module OpsWorks
 
       desc 'version', 'Print OpsWorks CLI version'
       def version
-        puts "opsworks-cli v#{OpsWorks::CLI::VERSION}"
+        say "opsworks-cli v#{OpsWorks::CLI::VERSION}"
       end
     end
   end
