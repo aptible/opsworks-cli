@@ -10,8 +10,8 @@ Gem::Specification.new do |spec|
   spec.version       = OpsWorks::CLI::VERSION
   spec.authors       = ['Frank Macreery']
   spec.email         = ['frank@macreery.com']
-  spec.description   = %q(OpsWorks CLI)
-  spec.summary       = %q(Alternative CLI for Amazon OpsWorks)
+  spec.description   = 'OpsWorks CLI'
+  spec.summary       = 'Alternative CLI for Amazon OpsWorks'
   spec.homepage      = 'https://github.com/aptible/opsworks-cli'
   spec.license       = 'MIT'
 
