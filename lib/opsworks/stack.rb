@@ -17,7 +17,6 @@ module OpsWorks
 
     def apps
       @apps ||= initialize_apps
-      @apps || []
     end
 
     def find_app_by_name(name)
@@ -45,9 +44,10 @@ module OpsWorks
     private
 
     def initialize_apps
-      return nil unless id
+      return [] unless id
       self.class.client.describe_apps(stack_id: id).data[:apps].map do |hash|
-        App.new(id: hash[:app_id], name: hash[:name])
+        revision = hash[:app_source][:revision] if hash[:app_source]
+        App.new(id: hash[:app_id], name: hash[:name], revision: revision)
       end
     end
 

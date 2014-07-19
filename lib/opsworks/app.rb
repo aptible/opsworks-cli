@@ -3,11 +3,10 @@ require_relative 'deployment'
 
 module OpsWorks
   class App < Resource
-    attr_accessor :id, :name
+    attr_accessor :id, :name, :revision
 
     def deployments
       @deployments ||= initialize_deployments
-      @deployments || []
     end
 
     def last_deployment
@@ -17,7 +16,7 @@ module OpsWorks
     private
 
     def initialize_deployments
-      return nil unless id
+      return [] unless id
       response = self.class.client.describe_deployments(app_id: id)
       response.data[:deployments].map do |hash|
         Deployment.new(
