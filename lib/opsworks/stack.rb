@@ -16,7 +16,14 @@ module OpsWorks
     end
 
     def apps
-      @apps ||= initialize_apps
+      Enumerator.new do |y|
+        raw_apps.each do |hash|
+          revision = hash[:app_source][:revision] if hash[:app_source]
+          y.yield App.new(id: hash[:app_id],
+                          name: hash[:name],
+                          revision: revision)
+        end
+      end
     end
 
     def find_app_by_name(name)
@@ -43,12 +50,10 @@ module OpsWorks
 
     private
 
-    def initialize_apps
+    def raw_apps
+      return @raw_apps if @raw_apps
       return [] unless id
-      self.class.client.describe_apps(stack_id: id).data[:apps].map do |hash|
-        revision = hash[:app_source][:revision] if hash[:app_source]
-        App.new(id: hash[:app_id], name: hash[:name], revision: revision)
-      end
+      @raw_apps = self.class.client.describe_apps(stack_id: id).data[:apps]
     end
 
     def create_deployment(options = {})

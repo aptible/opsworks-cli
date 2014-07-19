@@ -6,7 +6,15 @@ module OpsWorks
     attr_accessor :id, :name, :revision
 
     def deployments
-      @deployments ||= initialize_deployments
+      Enumerator.new do |y|
+        raw_deployments.each do |hash|
+          y.yield Deployment.new(
+            id: hash[:deployment_id],
+            created_at: hash[:created_at],
+            status: hash[:status]
+          )
+        end
+      end
     end
 
     def last_deployment
@@ -15,16 +23,11 @@ module OpsWorks
 
     private
 
-    def initialize_deployments
+    def raw_deployments
+      return @raw_deployments if @raw_deployments
       return [] unless id
       response = self.class.client.describe_deployments(app_id: id)
-      response.data[:deployments].map do |hash|
-        Deployment.new(
-          id: hash[:deployment_id],
-          created_at: hash[:created_at],
-          status: hash[:status]
-        )
-      end
+      @raw_deployments = response.data[:deployments]
     end
   end
 end

@@ -1,5 +1,5 @@
 require 'thor'
-require 'aws'
+require 'aws-sdk-core'
 
 require_relative 'helpers/keychain'
 require_relative 'helpers/options'
