@@ -10,7 +10,7 @@ module OpsWorks
           provider = AwsKeychainUtil::CredentialProvider.new(
             account, KEYCHAIN
           )
-          AWS.config(credential_provider: provider) if provider.set?
+          Aws.config[:credentials] = provider if provider.set?
         rescue LoadError
           # Keychain utility is optional and only relevant on OS X
           nil

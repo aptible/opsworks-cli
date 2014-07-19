@@ -7,7 +7,7 @@ module OpsWorks
     end
 
     def self.client
-      @client ||= AWS::OpsWorks::Client.new
+      @client ||= Aws::OpsWorks::Client.new
     end
 
     def self.account
