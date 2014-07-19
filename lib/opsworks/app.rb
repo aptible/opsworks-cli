@@ -3,7 +3,7 @@ require_relative 'deployment'
 
 module OpsWorks
   class App < Resource
-    attr_accessor :id, :name
+    attr_accessor :id, :name, :revision
 
     def deployments
       @deployments ||= initialize_deployments

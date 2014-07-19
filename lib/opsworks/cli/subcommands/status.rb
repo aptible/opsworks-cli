@@ -22,7 +22,7 @@ module OpsWorks
                 else
                   deployed_at = '-'
                 end
-                [stack.name, name, deployed_at]
+                [stack.name, name, "(#{app.revision})", deployed_at]
               end
               table.compact!
               print_table table
