@@ -52,7 +52,10 @@ module OpsWorks
     end
 
     def create_deployment(options = {})
-      self.class.client.create_deployment(options.merge(stack_id: id))
+      response = self.class.client.create_deployment(
+        options.merge(stack_id: id)
+      )
+      Deployment.from_response(response)
     end
   end
 end

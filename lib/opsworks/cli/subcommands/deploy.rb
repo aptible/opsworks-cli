@@ -11,10 +11,18 @@ module OpsWorks
             def deploy(name)
               fetch_keychain_credentials unless env_credentials?
               stacks = parse_stacks(options)
-              stacks.each do |stack|
+              deployments = stacks.map do |stack|
                 next unless (app = stack.find_app_by_name(name))
                 say "Deploying to #{stack.name}..."
                 stack.deploy_app(app)
+              end
+              Deployment.wait(deployments)
+              unless deployments.all?(&:success?)
+                failures = []
+                deployments.each_with_index do |deployment, i|
+                  failures << stacks[i].name if deployment.failed?
+                end
+                fail "Deploy failed on #{failures.join(', ')}"
               end
             end
           end

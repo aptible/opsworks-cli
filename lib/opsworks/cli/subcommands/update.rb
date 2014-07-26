@@ -16,9 +16,17 @@ module OpsWorks
             def update
               fetch_keychain_credentials unless env_credentials?
               stacks = parse_stacks(options)
-              stacks.each do |stack|
+              deployments = stacks.map do |stack|
                 say "Updating #{stack.name}..."
                 stack.update_custom_cookbooks
+              end
+              Deployment.wait(deployments)
+              unless deployments.all?(&:success?)
+                failures = []
+                deployments.each_with_index do |deployment, i|
+                  failures << stacks[i].name if deployment.failed?
+                end
+                fail "Update failed on #{failures.join(', ')}"
               end
             end
           end
