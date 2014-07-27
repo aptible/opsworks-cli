@@ -7,7 +7,7 @@ module OpsWorks
         def parse_stacks(options = {})
           stacks = OpsWorks::Stack.all
           if options[:stack]
-            stacks.select! { |stack| stack.name == options[:stack] }
+            stacks.select! { |stack| options[:stack].include?(stack.name)  }
           end
           stacks
         end

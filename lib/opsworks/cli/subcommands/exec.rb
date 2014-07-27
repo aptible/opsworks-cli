@@ -7,13 +7,21 @@ module OpsWorks
         def self.included(thor)
           thor.class_eval do
             desc 'exec [--stack STACK] RECIPE', 'Execute a Chef recipe'
-            option :stack
+            option :stack, type: :array
             def exec(recipe)
               fetch_keychain_credentials unless env_credentials?
               stacks = parse_stacks(options)
-              stacks.each do |stack|
+              deployments = stacks.map do |stack|
                 say "Executing recipe on #{stack.name}..."
                 stack.execute_recipe(recipe)
+              end
+              Deployment.wait(deployments)
+              unless deployments.all?(&:success?)
+                failures = []
+                deployments.each_with_index do |deployment, i|
+                  failures << stacks[i].name if deployment.failed?
+                end
+                fail "Command failed on #{failures.join(', ')}"
               end
             end
           end
