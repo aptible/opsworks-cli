@@ -12,7 +12,7 @@ module OpsWorks
             include Helpers::Options
 
             desc 'update [--stack STACK]', 'Update OpsWorks custom cookbooks'
-            option :stack
+            option :stack, type: :array
             def update
               fetch_keychain_credentials unless env_credentials?
               stacks = parse_stacks(options)

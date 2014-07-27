@@ -7,7 +7,7 @@ module OpsWorks
         def self.included(thor)
           thor.class_eval do
             desc 'deploy [--stack STACK] APP', 'Deploy an OpsWorks app'
-            option :stack
+            option :stack, type: :array
             def deploy(name)
               fetch_keychain_credentials unless env_credentials?
               stacks = parse_stacks(options)

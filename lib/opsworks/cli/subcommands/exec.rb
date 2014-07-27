@@ -7,7 +7,7 @@ module OpsWorks
         def self.included(thor)
           thor.class_eval do
             desc 'exec [--stack STACK] RECIPE', 'Execute a Chef recipe'
-            option :stack
+            option :stack, type: :array
             def exec(recipe)
               fetch_keychain_credentials unless env_credentials?
               stacks = parse_stacks(options)

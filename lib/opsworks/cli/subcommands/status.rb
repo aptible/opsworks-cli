@@ -11,7 +11,7 @@ module OpsWorks
 
             desc 'status [--stack STACK] APP',
                  'Display the most recent deployment of an app'
-            option :stack
+            option :stack, type: :array
             def status(name)
               fetch_keychain_credentials unless env_credentials?
 
