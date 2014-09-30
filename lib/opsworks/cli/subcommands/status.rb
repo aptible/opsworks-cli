@@ -25,8 +25,8 @@ module OpsWorks
                 [stack.name, name, "(#{app.revision})", deployed_at]
               end
               # Sort output in descending date order
-              table.sort! { |x, y| y.last <=> x.last }
               table.compact!
+              table.sort! { |x, y| y.last <=> x.last }
               print_table table
             end
 
