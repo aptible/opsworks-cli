@@ -19,7 +19,7 @@ module OpsWorks
               unless deployments.all?(&:success?)
                 failures = []
                 deployments.each_with_index do |deployment, i|
-                  failures << stacks[i].name if deployment.failed?
+                  failures << stacks[i].name unless deployment.success?
                 end
                 fail "Command failed on #{failures.join(', ')}"
               end
