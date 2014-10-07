@@ -18,6 +18,7 @@ module OpsWorks
                 say "Deploying to #{stack.name}..."
                 stack.deploy_app(app)
               end
+              deployments.compact!
               OpsWorks::Deployment.wait(deployments)
               unless deployments.all?(&:success?)
                 failures = []

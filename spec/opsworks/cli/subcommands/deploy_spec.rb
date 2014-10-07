@@ -27,6 +27,12 @@ describe OpsWorks::CLI::Agent do
       subject.deploy(app_name)
     end
 
+    it 'should not fail if a stack does not have the app' do
+      allow(stacks[0]).to receive(:apps) { [] }
+      expect(stacks[1]).to receive(:deploy_app).with(app) { deployment }
+      expect { subject.deploy(app_name) }.not_to raise_error
+    end
+
     it 'should fail if any update fails' do
       failure = Fabricate(:deployment, status: 'failed')
       expect(stacks[0]).to receive(:deploy_app).with(app) { failure }
