@@ -1,5 +1,5 @@
-require_relative 'resource'
-require_relative 'deployment'
+require 'opsworks/resource'
+require 'opsworks/deployment'
 
 module OpsWorks
   class App < Resource

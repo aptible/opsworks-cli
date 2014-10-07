@@ -1,5 +1,5 @@
-require_relative 'resource'
-require_relative 'app'
+require 'opsworks/resource'
+require 'opsworks/app'
 
 module OpsWorks
   class Stack < Resource

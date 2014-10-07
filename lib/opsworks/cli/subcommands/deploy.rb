@@ -1,3 +1,5 @@
+require 'opsworks/deployment'
+
 module OpsWorks
   module CLI
     module Subcommands
@@ -16,7 +18,7 @@ module OpsWorks
                 say "Deploying to #{stack.name}..."
                 stack.deploy_app(app)
               end
-              Deployment.wait(deployments)
+              OpsWorks::Deployment.wait(deployments)
               unless deployments.all?(&:success?)
                 failures = []
                 deployments.each_with_index do |deployment, i|

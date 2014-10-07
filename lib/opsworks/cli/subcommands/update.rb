@@ -1,4 +1,5 @@
 require 'aws'
+require 'opsworks/deployment'
 
 module OpsWorks
   module CLI
@@ -20,7 +21,7 @@ module OpsWorks
                 say "Updating #{stack.name}..."
                 stack.update_custom_cookbooks
               end
-              Deployment.wait(deployments)
+              OpsWorks::Deployment.wait(deployments)
               unless deployments.all?(&:success?)
                 failures = []
                 deployments.each_with_index do |deployment, i|

@@ -1,3 +1,5 @@
+require 'opsworks/deployment'
+
 module OpsWorks
   module CLI
     module Subcommands
@@ -15,7 +17,7 @@ module OpsWorks
                 say "Executing recipe on #{stack.name}..."
                 stack.execute_recipe(recipe)
               end
-              Deployment.wait(deployments)
+              OpsWorks::Deployment.wait(deployments)
               unless deployments.all?(&:success?)
                 failures = []
                 deployments.each_with_index do |deployment, i|
