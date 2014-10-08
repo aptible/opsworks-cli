@@ -12,7 +12,7 @@ module OpsWorks
             option :stack, type: :array
             def deploy(name)
               fetch_keychain_credentials unless env_credentials?
-              stacks = parse_stacks(options)
+              stacks = parse_stacks(options.merge(active: true))
               deployments = stacks.map do |stack|
                 next unless (app = stack.find_app_by_name(name))
                 say "Deploying to #{stack.name}..."

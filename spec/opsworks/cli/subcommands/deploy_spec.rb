@@ -11,11 +11,20 @@ describe OpsWorks::CLI::Agent do
     before { allow(subject).to receive(:say) }
     before { allow(OpsWorks::Deployment).to receive(:wait) }
     before { allow(OpsWorks::Stack).to receive(:all) { stacks } }
+    before { allow(OpsWorks::Stack).to receive(:active) { stacks } }
+
     before { stacks.each { |stack| allow(stack).to receive(:apps) { [app] } } }
 
     it 'should update custom cookbooks on all stacks' do
       expect(stacks[0]).to receive(:deploy_app).with(app) { deployment }
       expect(stacks[1]).to receive(:deploy_app).with(app) { deployment }
+      subject.deploy(app_name)
+    end
+
+    it 'should not fail if some stacks are inactive' do
+      allow(OpsWorks::Stack).to receive(:active) { [stacks[0]] }
+      expect(stacks[0]).to receive(:deploy_app).with(app) { deployment }
+      expect(stacks[1]).not_to receive(:deploy_app)
       subject.deploy(app_name)
     end
 

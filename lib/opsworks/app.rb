@@ -5,6 +5,13 @@ module OpsWorks
   class App < Resource
     attr_accessor :id, :name, :revision
 
+    def self.from_collection_response(response)
+      response.data[:apps].map do |hash|
+        revision = hash[:app_source][:revision] if hash[:app_source]
+        new(id: hash[:app_id], name: hash[:name], revision: revision)
+      end
+    end
+
     def deployments
       @deployments ||= initialize_deployments
     end

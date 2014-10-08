@@ -1,5 +1,6 @@
 require 'opsworks/resource'
 require 'opsworks/app'
+require 'opsworks/instance'
 
 module OpsWorks
   class Stack < Resource
@@ -9,6 +10,10 @@ module OpsWorks
       client.describe_stacks.data[:stacks].map do |hash|
         new(id: hash[:stack_id], name: hash[:name])
       end
+    end
+
+    def self.active
+      all.select(&:active?)
     end
 
     def self.find_by_name(name)
@@ -21,6 +26,10 @@ module OpsWorks
 
     def find_app_by_name(name)
       apps.find { |app| app.name == name }
+    end
+
+    def instances
+      @instances ||= initialize_instances
     end
 
     def update_custom_cookbooks
@@ -41,14 +50,22 @@ module OpsWorks
       create_deployment(app_id: app.id, command: { name: 'deploy' })
     end
 
+    def active?
+      instances.any?(&:online?)
+    end
+
     private
 
     def initialize_apps
       return [] unless id
-      self.class.client.describe_apps(stack_id: id).data[:apps].map do |hash|
-        revision = hash[:app_source][:revision] if hash[:app_source]
-        App.new(id: hash[:app_id], name: hash[:name], revision: revision)
-      end
+      response = self.class.client.describe_apps(stack_id: id)
+      App.from_collection_response(response)
+    end
+
+    def initialize_instances
+      return [] unless id
+      response = self.class.client.describe_instances(stack_id: id)
+      Instance.from_collection_response(response)
     end
 
     def create_deployment(options = {})

@@ -10,6 +10,7 @@ describe OpsWorks::CLI::Agent do
     before { allow(subject).to receive(:say) }
     before { allow(OpsWorks::Deployment).to receive(:wait) }
     before { allow(OpsWorks::Stack).to receive(:all) { stacks } }
+    before { allow(OpsWorks::Stack).to receive(:active) { stacks } }
 
     it 'should update custom cookbooks on all stacks' do
       expect(stacks[0]).to receive(:execute_recipe).with(recipe) { deployment }

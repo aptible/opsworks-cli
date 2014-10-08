@@ -16,7 +16,7 @@ module OpsWorks
             option :stack, type: :array
             def update
               fetch_keychain_credentials unless env_credentials?
-              stacks = parse_stacks(options)
+              stacks = parse_stacks(options.merge(active: true))
               deployments = stacks.map do |stack|
                 say "Updating #{stack.name}..."
                 stack.update_custom_cookbooks
