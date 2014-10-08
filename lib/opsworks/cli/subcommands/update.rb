@@ -1,4 +1,5 @@
 require 'aws'
+require 'opsworks/deployment'
 
 module OpsWorks
   module CLI
@@ -15,16 +16,16 @@ module OpsWorks
             option :stack, type: :array
             def update
               fetch_keychain_credentials unless env_credentials?
-              stacks = parse_stacks(options)
+              stacks = parse_stacks(options.merge(active: true))
               deployments = stacks.map do |stack|
                 say "Updating #{stack.name}..."
                 stack.update_custom_cookbooks
               end
-              Deployment.wait(deployments)
+              OpsWorks::Deployment.wait(deployments)
               unless deployments.all?(&:success?)
                 failures = []
                 deployments.each_with_index do |deployment, i|
-                  failures << stacks[i].name if deployment.failed?
+                  failures << stacks[i].name unless deployment.success?
                 end
                 fail "Update failed on #{failures.join(', ')}"
               end

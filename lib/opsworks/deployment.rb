@@ -1,20 +1,28 @@
-require_relative 'resource'
+require 'opsworks/resource'
 
 module OpsWorks
   class Deployment < Resource
     attr_accessor :id, :status, :created_at
 
+    TIMEOUT = 300
     POLL_INTERVAL = 5
+    API_LIMIT = 25
 
     # rubocop:disable MethodLength
-    def self.wait(deployments)
+    def self.wait(deployments, timeout = TIMEOUT)
+      start_time = Time.now
       while deployments.any?(&:running?)
+        return if Time.now - start_time > timeout
         sleep POLL_INTERVAL
-        response = client.describe_deployments(
-          deployment_ids: deployments.map(&:id)
-        )
-        updates = from_collection_response(response)
-        deployments.each do |deployment|
+        updates = []
+        running_deployments = deployments.select(&:running?)
+        running_deployments.map(&:id).each_slice(API_LIMIT) do |slice|
+          response = client.describe_deployments(
+            deployment_ids: slice
+          )
+          updates += from_collection_response(response)
+        end
+        running_deployments.each do |deployment|
           update = updates.find { |u| u.id == deployment.id }
           deployment.status = update.status
         end

@@ -1,3 +1,5 @@
+require 'aws'
+
 module OpsWorks
   class Resource
     def initialize(options = {})

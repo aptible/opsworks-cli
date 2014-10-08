@@ -1,3 +1,5 @@
+require 'opsworks/deployment'
+
 module OpsWorks
   module CLI
     module Subcommands
@@ -10,16 +12,16 @@ module OpsWorks
             option :stack, type: :array
             def exec(recipe)
               fetch_keychain_credentials unless env_credentials?
-              stacks = parse_stacks(options)
+              stacks = parse_stacks(options.merge(active: true))
               deployments = stacks.map do |stack|
                 say "Executing recipe on #{stack.name}..."
                 stack.execute_recipe(recipe)
               end
-              Deployment.wait(deployments)
+              OpsWorks::Deployment.wait(deployments)
               unless deployments.all?(&:success?)
                 failures = []
                 deployments.each_with_index do |deployment, i|
-                  failures << stacks[i].name if deployment.failed?
+                  failures << stacks[i].name unless deployment.success?
                 end
                 fail "Command failed on #{failures.join(', ')}"
               end

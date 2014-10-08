@@ -5,11 +5,13 @@ module OpsWorks
     module Helpers
       module Options
         def parse_stacks(options = {})
-          stacks = OpsWorks::Stack.all
           if options[:stack]
-            stacks.select! { |stack| options[:stack].include?(stack.name)  }
+            OpsWorks::Stack.all.select! do |stack|
+              options[:stack].include?(stack.name)
+            end
+          else
+            options[:active] ? OpsWorks::Stack.active : OpsWorks::Stack.all
           end
-          stacks
         end
       end
     end

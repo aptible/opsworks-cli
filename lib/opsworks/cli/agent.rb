@@ -9,10 +9,6 @@ require_relative 'subcommands/exec'
 require_relative 'subcommands/deploy'
 require_relative 'subcommands/status'
 
-require 'opsworks/stack'
-require 'opsworks/app'
-require 'opsworks/deployment'
-
 module OpsWorks
   module CLI
     class Agent < Thor

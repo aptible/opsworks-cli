@@ -1,3 +1,5 @@
+require 'opsworks/deployment'
+
 module OpsWorks
   module CLI
     module Subcommands
@@ -10,17 +12,18 @@ module OpsWorks
             option :stack, type: :array
             def deploy(name)
               fetch_keychain_credentials unless env_credentials?
-              stacks = parse_stacks(options)
+              stacks = parse_stacks(options.merge(active: true))
               deployments = stacks.map do |stack|
                 next unless (app = stack.find_app_by_name(name))
                 say "Deploying to #{stack.name}..."
                 stack.deploy_app(app)
               end
-              Deployment.wait(deployments)
+              deployments.compact!
+              OpsWorks::Deployment.wait(deployments)
               unless deployments.all?(&:success?)
                 failures = []
                 deployments.each_with_index do |deployment, i|
-                  failures << stacks[i].name if deployment.failed?
+                  failures << stacks[i].name unless deployment.success?
                 end
                 fail "Deploy failed on #{failures.join(', ')}"
               end
