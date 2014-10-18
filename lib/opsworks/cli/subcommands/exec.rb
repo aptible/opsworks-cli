@@ -8,7 +8,7 @@ module OpsWorks
         # rubocop:disable CyclomaticComplexity
         def self.included(thor)
           thor.class_eval do
-            desc 'exec [--stack STACK] RECIPE', 'Execute a Chef recipe'
+            desc 'exec RECIPE [--stack STACK]', 'Execute a Chef recipe'
             option :stack, type: :array
             def exec(recipe)
               fetch_keychain_credentials unless env_credentials?

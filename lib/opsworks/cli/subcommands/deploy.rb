@@ -8,7 +8,7 @@ module OpsWorks
         # rubocop:disable CyclomaticComplexity
         def self.included(thor)
           thor.class_eval do
-            desc 'deploy [--stack STACK] APP', 'Deploy an OpsWorks app'
+            desc 'deploy APP [--stack STACK]', 'Deploy an OpsWorks app'
             option :stack, type: :array
             def deploy(name)
               fetch_keychain_credentials unless env_credentials?

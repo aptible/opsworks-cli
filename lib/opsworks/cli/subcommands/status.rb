@@ -9,7 +9,7 @@ module OpsWorks
             include Helpers::Keychain
             include Helpers::Options
 
-            desc 'status [--stack STACK] APP',
+            desc 'status APP [--stack STACK]',
                  'Display the most recent deployment of an app'
             option :stack, type: :array
             def status(name)
