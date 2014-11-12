@@ -1,6 +1,7 @@
 require 'opsworks/resource'
 require 'opsworks/app'
 require 'opsworks/instance'
+require 'opsworks/permission'
 
 module OpsWorks
   class Stack < Resource
@@ -22,6 +23,14 @@ module OpsWorks
 
     def apps
       @apps ||= initialize_apps
+    end
+
+    def permissions
+      @permissions ||= initialize_permissions
+    end
+
+    def find_permission_by_user(name)
+      permissions.find { |permission| permission.user == name }
     end
 
     def find_app_by_name(name)
@@ -60,6 +69,12 @@ module OpsWorks
       return [] unless id
       response = self.class.client.describe_apps(stack_id: id)
       App.from_collection_response(response)
+    end
+
+    def initialize_permissions
+      return [] unless id
+      response = self.class.client.describe_permissions(stack_id: id)
+      Permission.from_collection_response(response)
     end
 
     def initialize_instances
