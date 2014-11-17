@@ -21,7 +21,7 @@ module OpsWorks
               stacks = parse_stacks(options.merge(active: true))
               version = OpsWorks::Stack.latest_chef_version
               stacks.each do |stack|
-                say "Upgrading #{stack.name}... to #{version}"
+                say "Upgrading #{stack.name} to #{version}..."
                 stack.upgrade_chef(version, options)
               end
             end
