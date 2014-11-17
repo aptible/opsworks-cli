@@ -7,6 +7,8 @@ module OpsWorks
   class Stack < Resource
     attr_accessor :id, :name
 
+    AVAILABLE_CHEF_VERSIONS = %w(0.9 11.4 11.10)
+
     def self.all
       client.describe_stacks.data[:stacks].map do |hash|
         new(id: hash[:stack_id], name: hash[:name])
@@ -19,6 +21,10 @@ module OpsWorks
 
     def self.find_by_name(name)
       all.find { |stack| stack.name == name }
+    end
+
+    def self.latest_chef_version
+      AVAILABLE_CHEF_VERSIONS.last
     end
 
     def apps
@@ -39,6 +45,14 @@ module OpsWorks
 
     def instances
       @instances ||= initialize_instances
+    end
+
+    def upgrade_chef(version, options = {})
+      self.class.client.update_stack(
+        stack_id: id,
+        configuration_manager: { name: 'Chef', version: version },
+        chef_configuration: { manage_berkshelf: options[:manage_berkshelf] }
+      )
     end
 
     def update_custom_cookbooks
