@@ -10,6 +10,7 @@ require_relative 'subcommands/deploy'
 require_relative 'subcommands/status'
 require_relative 'subcommands/allow'
 require_relative 'subcommands/lockdown'
+require_relative 'subcommands/upgrade_chef'
 
 module OpsWorks
   module CLI
@@ -22,6 +23,7 @@ module OpsWorks
       include Subcommands::Status
       include Subcommands::Allow
       include Subcommands::Lockdown
+      include Subcommands::UpgradeChef
 
       desc 'version', 'Print OpsWorks CLI version'
       def version
