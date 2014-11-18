@@ -111,7 +111,7 @@ module OpsWorks
         # REVIEW: Is there a better way to parse the JSON Path and ensure
         # a value at the location?
         path = JsonPath.new(key).path
-        hash.default_proc = -> (h, k) { h[k] = Hash.new(&h.default_proc) }
+        hash.default_proc = ->(h, k) { h[k] = Hash.new(&h.default_proc) }
         eval("hash#{path.join('')} = #{value.inspect}")
       else
         JsonPath.for(hash).gsub!(key) { value }.to_hash
