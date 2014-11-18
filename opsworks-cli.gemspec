@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'thor'
   spec.add_dependency 'aws-sdk'
+  spec.add_dependency 'jsonpath'
 
   spec.add_development_dependency 'aws-keychain-util'
   spec.add_development_dependency 'bundler', '~> 1.5'

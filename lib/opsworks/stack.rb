@@ -1,3 +1,5 @@
+require 'jsonpath'
+
 require 'opsworks/resource'
 require 'opsworks/app'
 require 'opsworks/instance'
@@ -5,13 +7,17 @@ require 'opsworks/permission'
 
 module OpsWorks
   class Stack < Resource
-    attr_accessor :id, :name
+    attr_accessor :id, :name, :custom_json
 
     AVAILABLE_CHEF_VERSIONS = %w(0.9 11.4 11.10)
 
     def self.all
       client.describe_stacks.data[:stacks].map do |hash|
-        new(id: hash[:stack_id], name: hash[:name])
+        new(
+          id: hash[:stack_id],
+          name: hash[:name],
+          custom_json: JSON.parse(hash[:custom_json])
+        )
       end
     end
 
@@ -76,6 +82,27 @@ module OpsWorks
     def active?
       instances.any?(&:online?)
     end
+
+    def custom_json_at(key)
+      JsonPath.new(key).first(custom_json)
+    end
+
+    # rubocop:disable Eval
+    def set_custom_json_at(key, value)
+      # REVIEW: Is there a better way to parse the JSON Path and ensure
+      # a value at the location?
+      # (e.g.) JsonPath.for(custom_json).gsub!(key) { value }.to_hash
+      path = JsonPath.new(key).path
+      # http://www.rubyflow.com/items/5667
+      self.custom_json = Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
+      eval("custom_json#{path.join('')} = #{value.inspect}")
+
+      self.class.client.update_stack(
+        stack_id: id,
+        custom_json: custom_json.to_json
+      )
+    end
+    # rubocop:enable Eval
 
     private
 
