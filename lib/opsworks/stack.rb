@@ -6,6 +6,7 @@ require 'opsworks/instance'
 require 'opsworks/permission'
 
 module OpsWorks
+  # rubocop:disable ClassLength
   class Stack < Resource
     attr_accessor :id, :name, :custom_json
 
@@ -87,22 +88,14 @@ module OpsWorks
       JsonPath.new(key).first(custom_json)
     end
 
-    # rubocop:disable Eval
     def set_custom_json_at(key, value)
-      # REVIEW: Is there a better way to parse the JSON Path and ensure
-      # a value at the location?
-      # (e.g.) JsonPath.for(custom_json).gsub!(key) { value }.to_hash
-      path = JsonPath.new(key).path
-      # http://www.rubyflow.com/items/5667
-      self.custom_json = Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
-      eval("custom_json#{path.join('')} = #{value.inspect}")
+      self.custom_json = replace_hash_at_path(custom_json, key, value)
 
       self.class.client.update_stack(
         stack_id: id,
         custom_json: custom_json.to_json
       )
     end
-    # rubocop:enable Eval
 
     private
 
@@ -111,6 +104,22 @@ module OpsWorks
       response = self.class.client.describe_apps(stack_id: id)
       App.from_collection_response(response)
     end
+
+    # rubocop:disable Eval
+    def replace_hash_at_path(hash, key, value)
+      if value
+        # REVIEW: Is there a better way to parse the JSON Path and ensure
+        # a value at the location?
+        path = JsonPath.new(key).path
+        hash.default_proc = -> (h, k) { h[k] = Hash.new(&h.default_proc) }
+        eval("hash#{path.join('')} = #{value.inspect}")
+      else
+        JsonPath.for(hash).gsub!(key) { value }.to_hash
+      end
+
+      hash
+    end
+    # rubocop:enable Eval
 
     def initialize_permissions
       return [] unless id
@@ -131,4 +140,5 @@ module OpsWorks
       Deployment.from_response(response)
     end
   end
+  # rubocop:enable ClassLength
 end
