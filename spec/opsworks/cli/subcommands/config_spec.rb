@@ -69,6 +69,17 @@ describe OpsWorks::CLI::Agent do
         end
         subject.send('config:unset', json_path)
         expect(stack.custom_json['env']['FOO']).to be_nil
+        expect(stack.custom_json['env'].keys).not_to include('FOO')
+      end
+
+      it 'should leave other variables alone' do
+        stack.custom_json['env'].merge!('OTHER' => 'something')
+        expect(client).to receive(:update_stack) do |hash|
+          json = JSON.parse(hash[:custom_json])
+          expect(json['env']['FOO']).to be_nil
+        end
+        subject.send('config:unset', json_path)
+        expect(stack.custom_json['env']).to eq('OTHER' => 'something')
       end
     end
   end
