@@ -113,7 +113,7 @@ module OpsWorks
         # a value at the location?
         hash.default_proc = ->(h, k) { h[k] = Hash.new(&h.default_proc) }
         eval("hash#{path.join('')} = #{value.inspect}")
-      elsif JsonPath.new(key).first(hash)
+      elsif JsonPath.new(key).on(hash).count > 0
         # Path value is present, but we need to unset it
         leaf_key = eval(path[-1]).first
         eval("hash#{path[0...-1].join('')}.delete(#{leaf_key.inspect})")
