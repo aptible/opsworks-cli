@@ -1,17 +1,24 @@
+require 'jsonpath'
+
 require 'opsworks/resource'
 require 'opsworks/app'
 require 'opsworks/instance'
 require 'opsworks/permission'
 
 module OpsWorks
+  # rubocop:disable ClassLength
   class Stack < Resource
-    attr_accessor :id, :name
+    attr_accessor :id, :name, :custom_json
 
     AVAILABLE_CHEF_VERSIONS = %w(0.9 11.4 11.10)
 
     def self.all
       client.describe_stacks.data[:stacks].map do |hash|
-        new(id: hash[:stack_id], name: hash[:name])
+        new(
+          id: hash[:stack_id],
+          name: hash[:name],
+          custom_json: JSON.parse(hash[:custom_json])
+        )
       end
     end
 
@@ -77,6 +84,19 @@ module OpsWorks
       instances.any?(&:online?)
     end
 
+    def custom_json_at(key)
+      JsonPath.new(key).first(custom_json)
+    end
+
+    def set_custom_json_at(key, value)
+      self.custom_json = replace_hash_at_path(custom_json, key, value)
+
+      self.class.client.update_stack(
+        stack_id: id,
+        custom_json: custom_json.to_json
+      )
+    end
+
     private
 
     def initialize_apps
@@ -84,6 +104,24 @@ module OpsWorks
       response = self.class.client.describe_apps(stack_id: id)
       App.from_collection_response(response)
     end
+
+    # rubocop:disable Eval
+    def replace_hash_at_path(hash, key, value)
+      path = JsonPath.new(key).path
+      if value
+        # REVIEW: Is there a better way to parse the JSON Path and ensure
+        # a value at the location?
+        hash.default_proc = ->(h, k) { h[k] = Hash.new(&h.default_proc) }
+        eval("hash#{path.join('')} = #{value.inspect}")
+      elsif JsonPath.new(key).on(hash).count > 0
+        # Path value is present, but we need to unset it
+        leaf_key = eval(path[-1]).first
+        eval("hash#{path[0...-1].join('')}.delete(#{leaf_key.inspect})")
+      end
+
+      hash
+    end
+    # rubocop:enable Eval
 
     def initialize_permissions
       return [] unless id
@@ -104,4 +142,5 @@ module OpsWorks
       Deployment.from_response(response)
     end
   end
+  # rubocop:enable ClassLength
 end

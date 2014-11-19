@@ -1,5 +1,5 @@
 require 'aws'
-require 'opsworks/deployment'
+require 'opsworks/stack'
 
 module OpsWorks
   module CLI
