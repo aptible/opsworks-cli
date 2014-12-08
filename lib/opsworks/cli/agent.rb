@@ -7,8 +7,7 @@ require_relative 'helpers/options'
 require_relative 'subcommands/update'
 require_relative 'subcommands/upgrade_chef'
 require_relative 'subcommands/exec'
-require_relative 'subcommands/deploy'
-require_relative 'subcommands/status'
+require_relative 'subcommands/apps'
 require_relative 'subcommands/iam'
 require_relative 'subcommands/config'
 
@@ -20,8 +19,7 @@ module OpsWorks
       include Subcommands::Update
       include Subcommands::UpgradeChef
       include Subcommands::Exec
-      include Subcommands::Deploy
-      include Subcommands::Status
+      include Subcommands::Apps
       include Subcommands::IAM
       include Subcommands::Config
 
