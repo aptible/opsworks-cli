@@ -1,4 +1,5 @@
 require 'jsonpath'
+require 'active_support/core_ext/hash/slice'
 
 require 'opsworks/resource'
 require 'opsworks/app'
@@ -95,6 +96,12 @@ module OpsWorks
         stack_id: id,
         custom_json: custom_json.to_json
       )
+    end
+
+    def create_app(name, options = {})
+      options = options.slice(:type, :shortname)
+      options.merge!(stack_id: id, name: name)
+      self.class.client.create_app(options)
     end
 
     private

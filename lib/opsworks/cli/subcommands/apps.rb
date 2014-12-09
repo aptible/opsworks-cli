@@ -51,6 +51,27 @@ module OpsWorks
               print_table table
             end
 
+            desc 'apps:create APP [--stack STACK]', 'Create a new OpsWorks app'
+            option :stack, type: :array
+            option :type, default: 'other'
+            option :git_url
+            option :shortname
+            define_method 'apps:create' do |name|
+              unless %w(other).include?(options[:type])
+                fail "Unsupported type: #{options[:type]}"
+              end
+
+              fail 'Git URL not yet supported' if options[:git_url]
+
+              fetch_keychain_credentials unless env_credentials?
+              stacks = parse_stacks(options)
+
+              stacks.each do |stack|
+                next if stack.apps.map(&:name).include?(name)
+                stack.create_app(name, options)
+              end
+            end
+
             private
 
             def formatted_time(timestamp)

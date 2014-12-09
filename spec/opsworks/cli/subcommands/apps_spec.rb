@@ -53,5 +53,38 @@ describe OpsWorks::CLI::Agent do
         expect { subject.send('apps:deploy', app_name) }.to raise_error
       end
     end
+
+    describe 'apps:create' do
+      # TODO: Figure out why Thor doesn't populate options from defaults
+      # when methods are invoked directly
+      let(:options) { { type: 'other' } }
+
+      before do
+        stacks.each { |stack| allow(stack).to receive(:apps) { [] } }
+      end
+
+      it 'should fail with a helpful error on unsupported type' do
+        options.merge!(type: 'foobar')
+        allow(subject).to receive(:options) { options }
+        expect { subject.send('apps:create', app_name) }.to raise_error
+      end
+
+      xit 'should accept a Git URL'
+
+      it 'should create an app' do
+        allow(subject).to receive(:options) { options }
+        expect(stacks[0]).to receive(:create_app).with(app_name, options)
+        expect(stacks[1]).to receive(:create_app).with(app_name, options)
+        subject.send('apps:create', app_name)
+      end
+
+      it 'should accept a different shortname' do
+        options.merge!(shortname: 'foobar')
+        allow(subject).to receive(:options) { options }
+        expect(stacks[0]).to receive(:create_app).with(app_name, options)
+        expect(stacks[1]).to receive(:create_app).with(app_name, options)
+        subject.send('apps:create', app_name)
+      end
+    end
   end
 end
