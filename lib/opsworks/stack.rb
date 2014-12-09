@@ -5,6 +5,7 @@ require 'opsworks/resource'
 require 'opsworks/app'
 require 'opsworks/instance'
 require 'opsworks/permission'
+require 'opsworks/layer'
 
 module OpsWorks
   # rubocop:disable ClassLength
@@ -53,6 +54,10 @@ module OpsWorks
 
     def instances
       @instances ||= initialize_instances
+    end
+
+    def layers
+      @layers ||= initialize_layers
     end
 
     def upgrade_chef(version, options = {})
@@ -140,6 +145,12 @@ module OpsWorks
       return [] unless id
       response = self.class.client.describe_instances(stack_id: id)
       Instance.from_collection_response(response)
+    end
+
+    def initialize_layers
+      return [] unless id
+      response = self.class.client.describe_layers(stack_id: id)
+      Layer.from_collection_response(response)
     end
 
     def create_deployment(options = {})

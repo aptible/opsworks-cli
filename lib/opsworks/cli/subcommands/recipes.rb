@@ -26,6 +26,22 @@ module OpsWorks
                 fail "Command failed on #{failures.join(', ')}"
               end
             end
+
+            desc 'recipes:add LAYER EVENT RECIPE [--stack STACK]',
+                 'Add a recipe to a given layer and lifecycle event'
+            option :stack, type: :array
+            define_method 'recipes:add' do |layername, event, recipe|
+              fetch_keychain_credentials unless env_credentials?
+              stacks = parse_stacks(options)
+              stacks.each do |stack|
+                layer = stack.layers.find { |l| l.shortname == layername }
+                next unless layer
+                next if layer.custom_recipes[event].include?(recipe)
+
+                say "Adding recipe to #{stack.name}."
+                layer.add_custom_recipe(event, recipe)
+              end
+            end
           end
         end
         # rubocop:enable CyclomaticComplexity
