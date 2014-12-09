@@ -68,6 +68,7 @@ module OpsWorks
 
               stacks.each do |stack|
                 next if stack.apps.map(&:name).include?(name)
+                say "Creating app on #{stack.name}."
                 stack.create_app(name, options)
               end
             end
