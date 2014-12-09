@@ -1,9 +1,11 @@
 require 'jsonpath'
+require 'active_support/core_ext/hash/slice'
 
 require 'opsworks/resource'
 require 'opsworks/app'
 require 'opsworks/instance'
 require 'opsworks/permission'
+require 'opsworks/layer'
 
 module OpsWorks
   # rubocop:disable ClassLength
@@ -54,6 +56,10 @@ module OpsWorks
       @instances ||= initialize_instances
     end
 
+    def layers
+      @layers ||= initialize_layers
+    end
+
     def upgrade_chef(version, options = {})
       self.class.client.update_stack(
         stack_id: id,
@@ -97,6 +103,12 @@ module OpsWorks
       )
     end
 
+    def create_app(name, options = {})
+      options = options.slice(:type, :shortname)
+      options.merge!(stack_id: id, name: name)
+      self.class.client.create_app(options)
+    end
+
     private
 
     def initialize_apps
@@ -133,6 +145,12 @@ module OpsWorks
       return [] unless id
       response = self.class.client.describe_instances(stack_id: id)
       Instance.from_collection_response(response)
+    end
+
+    def initialize_layers
+      return [] unless id
+      response = self.class.client.describe_layers(stack_id: id)
+      Layer.from_collection_response(response)
     end
 
     def create_deployment(options = {})

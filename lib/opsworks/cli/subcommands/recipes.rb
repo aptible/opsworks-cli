@@ -3,14 +3,14 @@ require 'opsworks/deployment'
 module OpsWorks
   module CLI
     module Subcommands
-      module Exec
+      module Recipes
         # rubocop:disable MethodLength
         # rubocop:disable CyclomaticComplexity
         def self.included(thor)
           thor.class_eval do
-            desc 'exec RECIPE [--stack STACK]', 'Execute a Chef recipe'
+            desc 'recipes:run RECIPE [--stack STACK]', 'Execute a Chef recipe'
             option :stack, type: :array
-            def exec(recipe)
+            define_method 'recipes:run' do |recipe|
               fetch_keychain_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
               deployments = stacks.map do |stack|
@@ -24,6 +24,22 @@ module OpsWorks
                   failures << stacks[i].name unless deployment.success?
                 end
                 fail "Command failed on #{failures.join(', ')}"
+              end
+            end
+
+            desc 'recipes:add LAYER EVENT RECIPE [--stack STACK]',
+                 'Add a recipe to a given layer and lifecycle event'
+            option :stack, type: :array
+            define_method 'recipes:add' do |layername, event, recipe|
+              fetch_keychain_credentials unless env_credentials?
+              stacks = parse_stacks(options)
+              stacks.each do |stack|
+                layer = stack.layers.find { |l| l.shortname == layername }
+                next unless layer
+                next if layer.custom_recipes[event].include?(recipe)
+
+                say "Adding recipe to #{stack.name}."
+                layer.add_custom_recipe(event, recipe)
               end
             end
           end
