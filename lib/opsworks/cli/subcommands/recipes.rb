@@ -3,14 +3,14 @@ require 'opsworks/deployment'
 module OpsWorks
   module CLI
     module Subcommands
-      module Exec
+      module Recipes
         # rubocop:disable MethodLength
         # rubocop:disable CyclomaticComplexity
         def self.included(thor)
           thor.class_eval do
-            desc 'exec RECIPE [--stack STACK]', 'Execute a Chef recipe'
+            desc 'recipes:run RECIPE [--stack STACK]', 'Execute a Chef recipe'
             option :stack, type: :array
-            def exec(recipe)
+            define_method 'recipes:run' do |recipe|
               fetch_keychain_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
               deployments = stacks.map do |stack|
