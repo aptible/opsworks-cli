@@ -14,6 +14,7 @@ module OpsWorks
 
             desc 'update [--stack STACK]', 'Update OpsWorks custom cookbooks'
             option :stack, type: :array
+            option :timeout, type: :numeric
             def update
               fetch_keychain_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
@@ -21,7 +22,7 @@ module OpsWorks
                 say "Updating #{stack.name}..."
                 stack.update_custom_cookbooks
               end
-              OpsWorks::Deployment.wait(deployments)
+              OpsWorks::Deployment.wait(deployments, options[:timeout])
               unless deployments.all?(&:success?)
                 failures = []
                 deployments.each_with_index do |deployment, i|
