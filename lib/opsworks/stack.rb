@@ -118,12 +118,15 @@ module OpsWorks
     end
 
     # rubocop:disable Eval
+    # rubocop:disable MethodLength
     def replace_hash_at_path(hash, key, value)
       path = JsonPath.new(key).path
       if value
         # REVIEW: Is there a better way to parse the JSON Path and ensure
         # a value at the location?
-        hash.default_proc = ->(h, k) { h[k] = Hash.new(&h.default_proc) }
+        (0...(path.length - 1)).each do |i|
+          eval("hash#{path[0..i].join('')} ||= {}")
+        end
         eval("hash#{path.join('')} = #{value.inspect}")
       elsif JsonPath.new(key).on(hash).count > 0
         # Path value is present, but we need to unset it
@@ -133,6 +136,7 @@ module OpsWorks
 
       hash
     end
+    # rubocop:enable MethodLength
     # rubocop:enable Eval
 
     def initialize_permissions

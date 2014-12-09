@@ -38,6 +38,16 @@ describe OpsWorks::CLI::Agent do
         expect(stack.custom_json['env']['FOO']).to eq 'baz'
       end
 
+      it 'should work with deep nested hashes' do
+        stack.custom_json = { 'app' => { 'var' => 'value' } }
+        expect(client).to receive(:update_stack) do |hash|
+          json = JSON.parse(hash[:custom_json])
+          expect(json['app']['env']['FOO']).to eq 'baz'
+        end
+        subject.send('config:set', 'app.env.FOO', 'baz')
+        expect(stack.custom_json['app']['env']['FOO']).to eq 'baz'
+      end
+
       it 'should set the variable, if it is unset' do
         stack.custom_json = {}
         expect(client).to receive(:update_stack) do |hash|
