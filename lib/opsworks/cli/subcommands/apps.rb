@@ -11,7 +11,7 @@ module OpsWorks
           thor.class_eval do
             desc 'apps:deploy APP [--stack STACK]', 'Deploy an OpsWorks app'
             option :stack, type: :array
-            option :timeout, type: :numeric
+            option :timeout, type: :numeric, default: 300
             define_method 'apps:deploy' do |name|
               fetch_keychain_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
