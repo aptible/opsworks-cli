@@ -10,7 +10,7 @@ module OpsWorks
           thor.class_eval do
             desc 'recipes:run RECIPE [--stack STACK]', 'Execute a Chef recipe'
             option :stack, type: :array
-            option :timeout, type: :numeric
+            option :timeout, type: :numeric, default: 300
             define_method 'recipes:run' do |recipe|
               fetch_keychain_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))

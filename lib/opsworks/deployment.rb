@@ -11,6 +11,7 @@ module OpsWorks
     # rubocop:disable MethodLength
     def self.wait(deployments, timeout = TIMEOUT)
       start_time = Time.now
+      timeout ||= TIMEOUT
       while deployments.any?(&:running?)
         return if Time.now - start_time > timeout
         sleep POLL_INTERVAL
