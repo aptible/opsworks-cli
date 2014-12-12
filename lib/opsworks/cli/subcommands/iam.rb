@@ -36,7 +36,6 @@ module OpsWorks
                 end
               end
             end
-
           end
         end
         # rubocop:enable CyclomaticComplexity
