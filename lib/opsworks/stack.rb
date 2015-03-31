@@ -19,7 +19,7 @@ module OpsWorks
         new(
           id: hash[:stack_id],
           name: hash[:name],
-          custom_json: JSON.parse(hash[:custom_json])
+          custom_json: JSON.parse(hash.fetch(:custom_json, '{}'))
         )
       end
     end
