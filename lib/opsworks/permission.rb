@@ -17,7 +17,7 @@ module OpsWorks
     end
 
     def user
-      iam_user_arn.gsub(/^.*user\//, '')
+      iam_user_arn.gsub(%r{^.*user/}, '')
     end
 
     def ssh?
