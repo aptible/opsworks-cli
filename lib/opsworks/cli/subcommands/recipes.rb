@@ -12,7 +12,7 @@ module OpsWorks
             option :stack, type: :array
             option :timeout, type: :numeric, default: 300
             define_method 'recipes:run' do |recipe|
-              fetch_keychain_credentials unless env_credentials?
+              fetch_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
               deployments = stacks.map do |stack|
                 say "Executing recipe on #{stack.name}..."
@@ -32,7 +32,7 @@ module OpsWorks
                  'Add a recipe to a given layer and lifecycle event'
             option :stack, type: :array
             define_method 'recipes:add' do |layername, event, recipe|
-              fetch_keychain_credentials unless env_credentials?
+              fetch_credentials unless env_credentials?
               stacks = parse_stacks(options)
               stacks.each do |stack|
                 layer = stack.layers.find { |l| l.shortname == layername }

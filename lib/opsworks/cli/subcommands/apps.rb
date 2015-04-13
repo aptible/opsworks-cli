@@ -13,7 +13,7 @@ module OpsWorks
             option :stack, type: :array
             option :timeout, type: :numeric, default: 300
             define_method 'apps:deploy' do |name|
-              fetch_keychain_credentials unless env_credentials?
+              fetch_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
               deployments = stacks.map do |stack|
                 next unless (app = stack.find_app_by_name(name))
@@ -35,7 +35,7 @@ module OpsWorks
                  'Display the most recent deployment of an app'
             option :stack, type: :array
             define_method 'apps:status' do |name|
-              fetch_keychain_credentials unless env_credentials?
+              fetch_credentials unless env_credentials?
 
               table = parse_stacks(options).map do |stack|
                 next unless (app = stack.find_app_by_name(name))
@@ -64,7 +64,7 @@ module OpsWorks
 
               fail 'Git URL not yet supported' if options[:git_url]
 
-              fetch_keychain_credentials unless env_credentials?
+              fetch_credentials unless env_credentials?
               stacks = parse_stacks(options)
 
               stacks.each do |stack|

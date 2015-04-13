@@ -9,14 +9,11 @@ module OpsWorks
         # rubocop:disable CyclomaticComplexity
         def self.included(thor)
           thor.class_eval do
-            include Helpers::Keychain
-            include Helpers::Options
-
             desc 'update [--stack STACK]', 'Update OpsWorks custom cookbooks'
             option :stack, type: :array
             option :timeout, type: :numeric, default: 300
             def update
-              fetch_keychain_credentials unless env_credentials?
+              fetch_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
               deployments = stacks.map do |stack|
                 say "Updating #{stack.name}..."
