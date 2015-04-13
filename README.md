@@ -19,13 +19,7 @@ The gem expects to have access to your AWS access key ID and secret access key. 
     export AWS_ACCESS_KEY_ID=...
     export AWS_SECRET_ACCESS_KEY=...
 
-If you're on OS X, you may also use the [aws-keychain-util](https://github.com/zwily/aws-keychain-util) to password-protect these credentials within the OS X Keychain. To do this, follow the instructions in the gem's README:
-
-    gem install aws-keychain-util
-    aws-creds init
-    aws-creds add
-
-When you add credentials, make sure to name the account `default`.
+Second (the preferred option), you may use the [Omnivault](https://github.com/aptible/omnivault) gem to store and configure your credentials automatically, via your choice of password-protected vault (Apple Keychain or pws).
 
 ## Usage
 

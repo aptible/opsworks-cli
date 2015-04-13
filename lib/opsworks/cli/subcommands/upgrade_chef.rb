@@ -9,15 +9,12 @@ module OpsWorks
         # rubocop:disable CyclomaticComplexity
         def self.included(thor)
           thor.class_eval do
-            include Helpers::Keychain
-            include Helpers::Options
-
             desc 'upgrade-chef [--stack STACK]', 'Upgrade Chef version'
             option :stack, type: :array
             option :version
             option :manage_berkshelf, type: :boolean, default: false
             def upgrade_chef
-              fetch_keychain_credentials unless env_credentials?
+              fetch_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
               version = OpsWorks::Stack.latest_chef_version
               stacks.each do |stack|

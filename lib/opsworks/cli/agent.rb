@@ -1,7 +1,7 @@
 require 'thor'
 require 'aws'
 
-require_relative 'helpers/keychain'
+require_relative 'helpers/credentials'
 require_relative 'helpers/options'
 
 require_relative 'subcommands/update'
@@ -15,6 +15,9 @@ module OpsWorks
   module CLI
     class Agent < Thor
       include Thor::Actions
+
+      include Helpers::Credentials
+      include Helpers::Options
 
       include Subcommands::Update
       include Subcommands::UpgradeChef
