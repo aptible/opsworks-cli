@@ -43,6 +43,22 @@ module OpsWorks
                 layer.add_custom_recipe(event, recipe)
               end
             end
+
+            desc 'recipes:rm LAYER EVENT RECIPE [--stack STACK]',
+                 'Remove a recipe from a given layer and lifecycle event'
+            option :stack, type: :array
+            define_method 'recipes:rm' do |layername, event, recipe|
+              fetch_credentials unless env_credentials?
+              stacks = parse_stacks(options)
+              stacks.each do |stack|
+                layer = stack.layers.find { |l| l.shortname == layername }
+                next unless layer
+                next unless layer.custom_recipes[event].include?(recipe)
+
+                say "Removing recipe from #{stack.name}."
+                layer.remove_custom_recipe(event, recipe)
+              end
+            end
           end
         end
         # rubocop:enable CyclomaticComplexity

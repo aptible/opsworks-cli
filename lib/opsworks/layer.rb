@@ -32,5 +32,15 @@ module OpsWorks
         custom_recipes: custom_recipes
       )
     end
+
+    def remove_custom_recipe(event, recipe)
+      return unless custom_recipes[event].include?(recipe)
+
+      custom_recipes[event].delete recipe
+      self.class.client.update_layer(
+        layer_id: id,
+        custom_recipes: custom_recipes
+      )
+    end
   end
 end
