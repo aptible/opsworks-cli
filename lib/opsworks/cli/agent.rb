@@ -4,7 +4,6 @@ require 'aws'
 require_relative 'helpers/credentials'
 require_relative 'helpers/options'
 
-require_relative 'subcommands/update'
 require_relative 'subcommands/chef'
 require_relative 'subcommands/recipes'
 require_relative 'subcommands/apps'
@@ -19,7 +18,6 @@ module OpsWorks
       include Helpers::Credentials
       include Helpers::Options
 
-      include Subcommands::Update
       include Subcommands::Chef
       include Subcommands::Recipes
       include Subcommands::Apps
