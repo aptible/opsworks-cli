@@ -29,6 +29,8 @@ Commands:
   opsworks apps:create APP [--stack STACK]                 # Create a new OpsWorks app
   opsworks apps:deploy APP [--stack STACK]                 # Deploy an OpsWorks app
   opsworks apps:status APP [--stack STACK]                 # Display the most recent deployment of an app
+  opsworks chef:configure [--stack STACK]                  # Configure Chef/Berkshelf
+  opsworks chef:sync [--stack STACK]                       # Sync OpsWorks custom cookbooks
   opsworks config:get KEY [--stack STACK]                  # Get a single config value
   opsworks config:set KEY VALUE [--stack STACK]            # Set a config value
   opsworks config:unset KEY [--stack STACK]                # Unset a config value
@@ -36,9 +38,8 @@ Commands:
   opsworks iam:allow USER [--stack STACK]                  # Allow an IAM user on a stack
   opsworks iam:lockdown [--stack STACK]                    # Remove all stack permissions
   opsworks recipes:add LAYER EVENT RECIPE [--stack STACK]  # Add a recipe to a given layer and lifecycle event
+  opsworks recipes:rm LAYER EVENT RECIPE [--stack STACK]   # Remove a recipe from a given layer and lifecycle event
   opsworks recipes:run RECIPE [--stack STACK]              # Execute a Chef recipe
-  opsworks update [--stack STACK]                          # Update OpsWorks custom cookbooks
-  opsworks upgrade-chef [--stack STACK]                    # Upgrade Chef version
   opsworks version                                         # Print OpsWorks CLI version
 ```
 
