@@ -60,12 +60,30 @@ module OpsWorks
       @layers ||= initialize_layers
     end
 
-    def upgrade_chef(version, options = {})
-      self.class.client.update_stack(
+    def update_chef(options)
+      params = {
         stack_id: id,
-        configuration_manager: { name: 'Chef', version: version },
-        chef_configuration: { manage_berkshelf: options[:manage_berkshelf] }
-      )
+        configuration_manager: { name: 'Chef', version: options[:version] },
+        chef_configuration: {
+          manage_berkshelf: options[:manage_berkshelf],
+          berkshelf_version: options[:berkshelf_version]
+        }
+      }
+      if options[:cookbook_git_url]
+        params[:custom_cookbooks_source] = {
+          type: 'git',
+          url: options[:cookbook_git_url],
+          revision: options[:cookbook_branch] || 'master'
+        }
+      elsif options[:cookbook_s3_url]
+        params[:custom_cookbooks_source] = {
+          type: 's3',
+          url: options[:cookbook_s3_url],
+          username: options[:cookbook_username],
+          password: options[:cookbook_password]
+        }
+      end
+      self.class.client.update_stack(params)
     end
 
     def update_custom_cookbooks
