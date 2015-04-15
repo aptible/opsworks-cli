@@ -4,22 +4,27 @@ require 'opsworks/stack'
 module OpsWorks
   module CLI
     module Subcommands
-      module UpgradeChef
+      module Chef
         # rubocop:disable MethodLength
         # rubocop:disable CyclomaticComplexity
         def self.included(thor)
           thor.class_eval do
-            desc 'upgrade-chef [--stack STACK]', 'Upgrade Chef version'
+            desc 'chef:configure [--stack STACK]', 'Configure Chef/Berkshelf'
             option :stack, type: :array
-            option :version
+            option :version, default: OpsWorks::Stack.latest_chef_version
             option :manage_berkshelf, type: :boolean, default: false
-            def upgrade_chef
+            option :berkshelf_version, default: '3.2.0'
+            option :cookbook_git_url
+            option :cookbook_branch
+            option :cookbook_s3_url
+            option :cookbook_username
+            option :cookbook_password
+            define_method 'chef:configure' do
               fetch_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
-              version = OpsWorks::Stack.latest_chef_version
               stacks.each do |stack|
-                say "Upgrading #{stack.name} to #{version}..."
-                stack.upgrade_chef(version, options)
+                say "Configuring Chef #{options[:version]} on #{stack.name}..."
+                stack.update_chef(options)
               end
             end
           end
