@@ -69,6 +69,16 @@ describe OpsWorks::CLI::Agent do
         expect(stack.custom_json['env']['FOO']).to eq 'baz'
         expect(stack.custom_json['other']).to eq 'something'
       end
+
+      it 'should typecast Boolean values' do
+        stack.custom_json = {}
+        expect(client).to receive(:update_stack) do |hash|
+          json = JSON.parse(hash[:custom_json])
+          expect(json['env']['FOO']).to eq true
+        end
+        subject.send('config:set', json_path, 'true')
+        expect(stack.custom_json['env']['FOO']).to eq true
+      end
     end
 
     describe 'config:unset' do

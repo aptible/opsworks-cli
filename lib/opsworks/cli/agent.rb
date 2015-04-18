@@ -3,6 +3,7 @@ require 'aws'
 
 require_relative 'helpers/credentials'
 require_relative 'helpers/options'
+require_relative 'helpers/typecasts'
 
 require_relative 'subcommands/chef'
 require_relative 'subcommands/recipes'
@@ -17,6 +18,7 @@ module OpsWorks
 
       include Helpers::Credentials
       include Helpers::Options
+      include Helpers::Typecasts
 
       include Subcommands::Chef
       include Subcommands::Recipes

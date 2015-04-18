@@ -28,7 +28,7 @@ module OpsWorks
               fetch_credentials unless env_credentials?
               parse_stacks(options).each do |stack|
                 say "Updating #{stack.name}..."
-                stack.set_custom_json_at(key, value)
+                stack.set_custom_json_at(key, typecast_string_argument(value))
               end
             end
 
