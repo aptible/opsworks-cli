@@ -20,20 +20,24 @@ describe OpsWorks::CLI::Agent do
       end
 
       it 'should update custom cookbooks on all stacks' do
-        expect(stacks[0]).to receive(:deploy_app).with(app, anything) { success }
-        expect(stacks[1]).to receive(:deploy_app).with(app, anything) { success }
+        expect(stacks[0]).to receive(:deploy_app)
+          .with(app, anything) { success }
+        expect(stacks[1]).to receive(:deploy_app)
+          .with(app, anything) { success }
         subject.send('apps:deploy', app_name)
       end
 
       it 'should not fail if some stacks are inactive' do
         allow(OpsWorks::Stack).to receive(:active) { [stacks[0]] }
-        expect(stacks[0]).to receive(:deploy_app).with(app, anything) { success }
+        expect(stacks[0]).to receive(:deploy_app)
+          .with(app, anything) { success }
         expect(stacks[1]).not_to receive(:deploy_app)
         subject.send('apps:deploy', app_name)
       end
 
       it 'should optionally run on a subset of stacks' do
-        expect(stacks[0]).to receive(:deploy_app).with(app, anything) { success }
+        expect(stacks[0]).to receive(:deploy_app)
+          .with(app, anything) { success }
         expect(stacks[1]).not_to receive(:deploy_app)
 
         allow(subject).to receive(:options) { { stack: [stacks[0].name] } }
@@ -41,8 +45,10 @@ describe OpsWorks::CLI::Agent do
       end
 
       it 'should optionally run migrations' do
-        expect(stacks[0]).to receive(:deploy_app).with(app, {'migrate' => ['true']}) { success }
-        expect(stacks[1]).to receive(:deploy_app).with(app, {'migrate' => ['true']}) { success }
+        expect(stacks[0]).to receive(:deploy_app)
+          .with(app, 'migrate' => ['true']) { success }
+        expect(stacks[1]).to receive(:deploy_app)
+          .with(app, 'migrate' => ['true']) { success }
 
         allow(subject).to receive(:options) { { migrate: true } }
         subject.send('apps:deploy', app_name)
@@ -50,12 +56,14 @@ describe OpsWorks::CLI::Agent do
 
       it 'should not fail if a stack does not have the app' do
         allow(stacks[0]).to receive(:apps) { [] }
-        expect(stacks[1]).to receive(:deploy_app).with(app, anything) { success }
+        expect(stacks[1]).to receive(:deploy_app)
+          .with(app, anything) { success }
         expect { subject.send('apps:deploy', app_name) }.not_to raise_error
       end
 
       it 'should fail if any update fails' do
-        expect(stacks[0]).to receive(:deploy_app).with(app, anything) { failure }
+        expect(stacks[0]).to receive(:deploy_app)
+          .with(app, anything) { failure }
 
         allow(subject).to receive(:options) { { stack: [stacks[0].name] } }
         expect { subject.send('apps:deploy', app_name) }.to raise_error
