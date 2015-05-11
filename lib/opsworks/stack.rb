@@ -99,9 +99,15 @@ module OpsWorks
       )
     end
 
-    def deploy_app(app)
+    def deploy_app(app, args = {})
       fail 'App not found' unless app && app.id
-      create_deployment(app_id: app.id, command: { name: 'deploy' })
+      create_deployment(
+        app_id: app.id,
+        command: {
+          name: 'deploy',
+          args: args
+        }
+      )
     end
 
     def active?

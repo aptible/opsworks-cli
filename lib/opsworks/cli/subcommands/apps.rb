@@ -12,13 +12,14 @@ module OpsWorks
             desc 'apps:deploy APP [--stack STACK]', 'Deploy an OpsWorks app'
             option :stack, type: :array
             option :timeout, type: :numeric, default: 300
+            option :migrate, type: :boolean, default: false
             define_method 'apps:deploy' do |name|
               fetch_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
               deployments = stacks.map do |stack|
                 next unless (app = stack.find_app_by_name(name))
                 say "Deploying to #{stack.name}..."
-                stack.deploy_app(app)
+                stack.deploy_app(app, 'migrate' => [options[:migrate].to_s])
               end
               deployments.compact!
               OpsWorks::Deployment.wait(deployments, options[:timeout])
