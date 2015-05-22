@@ -123,7 +123,7 @@ module OpsWorks
 
       self.class.client.update_stack(
         stack_id: id,
-        custom_json: custom_json.to_json
+        custom_json: JSON.pretty_generate(custom_json)
       )
     end
 
