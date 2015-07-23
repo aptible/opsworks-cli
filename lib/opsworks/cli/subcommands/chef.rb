@@ -12,7 +12,7 @@ module OpsWorks
             desc 'chef:configure [--stack STACK]', 'Configure Chef/Berkshelf'
             option :stack, type: :array
             option :version, default: OpsWorks::Stack.latest_chef_version
-            option :manage_berkshelf, type: :boolean, default: false
+            option :manage_berkshelf, type: :boolean, default: true
             option :berkshelf_version, default: '3.2.0'
             option :cookbook_git_url
             option :cookbook_branch
