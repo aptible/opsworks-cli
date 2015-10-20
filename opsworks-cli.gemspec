@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'thor'
-  spec.add_dependency 'aws-sdk', '~> 1.64'
+  spec.add_dependency 'aws-sdk-v1', '~> 1.64'
   spec.add_dependency 'jsonpath'
   spec.add_dependency 'activesupport'
   spec.add_dependency 'omnivault'
