@@ -145,7 +145,7 @@ module OpsWorks
     # rubocop:disable MethodLength
     def replace_hash_at_path(hash, key, value)
       path = JsonPath.new(key).path
-      if value
+      if !value.nil?
         # REVIEW: Is there a better way to parse the JSON Path and ensure
         # a value at the location?
         (0...(path.length - 1)).each do |i|
