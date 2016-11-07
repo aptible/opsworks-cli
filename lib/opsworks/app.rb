@@ -20,6 +20,15 @@ module OpsWorks
       deployments.find(&:success?)
     end
 
+    def update_revision(revision)
+      self.class.client.update_app(
+        app_id: id,
+        app_source: { revision: revision }
+      )
+
+      self.revision = revision
+    end
+
     private
 
     def initialize_deployments
