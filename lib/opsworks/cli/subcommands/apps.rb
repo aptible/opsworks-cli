@@ -75,6 +75,19 @@ module OpsWorks
               end
             end
 
+            desc 'apps:revision:update APP REVISION [--stack STACK]',
+                 'Set the revision for an app'
+            option :stack, type: :array
+            define_method 'apps:revision:update' do |app_name, revision|
+              fetch_credentials unless env_credentials?
+              stacks = parse_stacks(options.merge(active: true))
+              stacks.each do |stack|
+                next unless (app = stack.find_app_by_name(app_name))
+                say "Updating #{stack.name} (from: #{app.revision})..."
+                app.update_revision(revision)
+              end
+            end
+
             private
 
             def formatted_time(timestamp)
