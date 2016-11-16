@@ -2,7 +2,7 @@ require 'opsworks/resource'
 
 module OpsWorks
   class Deployment < Resource
-    attr_accessor :id, :status, :created_at
+    attr_accessor :id, :command, :status, :created_at, :custom_json, :app_id
 
     TIMEOUT = 300
     POLL_INTERVAL = 5
@@ -35,8 +35,11 @@ module OpsWorks
       response.data[:deployments].map do |hash|
         new(
           id: hash[:deployment_id],
+          command: hash[:command],
           created_at: hash[:created_at],
-          status: hash[:status]
+          status: hash[:status],
+          custom_json: hash[:custom_json],
+          app_id: hash[:app_id]
         )
       end
     end

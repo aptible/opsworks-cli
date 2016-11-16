@@ -60,6 +60,10 @@ module OpsWorks
       @layers ||= initialize_layers
     end
 
+    def deployments
+      @deployments ||= initialize_deployments
+    end
+
     def update_chef(options)
       params = {
         stack_id: id,
@@ -179,6 +183,12 @@ module OpsWorks
       return [] unless id
       response = self.class.client.describe_layers(stack_id: id)
       Layer.from_collection_response(response)
+    end
+
+    def initialize_deployments
+      return [] unless id
+      response = self.class.client.describe_deployments(stack_id: id)
+      Deployment.from_collection_response(response)
     end
 
     def create_deployment(options = {})
