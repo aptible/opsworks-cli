@@ -8,7 +8,6 @@ module OpsWorks
     POLL_INTERVAL = 5
     API_LIMIT = 25
 
-    # rubocop:disable MethodLength
     def self.wait(deployments, timeout = TIMEOUT)
       start_time = Time.now
       timeout ||= TIMEOUT
@@ -29,7 +28,6 @@ module OpsWorks
         end
       end
     end
-    # rubocop:enble MethodLength
 
     def self.from_collection_response(response)
       response.data[:deployments].map do |hash|

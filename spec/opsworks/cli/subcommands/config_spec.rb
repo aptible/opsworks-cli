@@ -59,7 +59,7 @@ describe OpsWorks::CLI::Agent do
       end
 
       it 'should leave other variables alone' do
-        stack.custom_json.merge!('other' => 'something')
+        stack.custom_json['other'] = 'something'
         expect(client).to receive(:update_stack) do |hash|
           json = JSON.parse(hash[:custom_json])
           expect(json['env']['FOO']).to eq 'baz'
@@ -92,7 +92,7 @@ describe OpsWorks::CLI::Agent do
       end
 
       it 'should leave other variables alone' do
-        stack.custom_json['env'].merge!('OTHER' => 'something')
+        stack.custom_json['env']['OTHER'] = 'something'
         expect(client).to receive(:update_stack) do |hash|
           json = JSON.parse(hash[:custom_json])
           expect(json['env'].keys).not_to include('FOO')

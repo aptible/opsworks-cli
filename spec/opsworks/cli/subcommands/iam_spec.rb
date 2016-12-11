@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe OpsWorks::CLI::Agent do
   context 'iam' do
-    let(:permissions) { 2.times.map { Fabricate(:permission) } }
+    let(:permissions) { Array.new(2) { Fabricate(:permission) } }
     let(:user) { permissions[0].user }
 
     before { allow(subject).to receive(:say) }
@@ -11,7 +11,7 @@ describe OpsWorks::CLI::Agent do
 
     describe 'iam:allow' do
       let(:stacks) do
-        2.times.map do |i|
+        Array.new(2) do |i|
           Fabricate(:stack).tap do |stack|
             allow(stack).to receive(:find_permission_by_user) { permissions[i] }
           end

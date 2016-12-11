@@ -8,11 +8,10 @@ require 'opsworks/permission'
 require 'opsworks/layer'
 
 module OpsWorks
-  # rubocop:disable ClassLength
   class Stack < Resource
     attr_accessor :id, :name, :custom_json
 
-    AVAILABLE_CHEF_VERSIONS = %w(0.9 11.4 11.10)
+    AVAILABLE_CHEF_VERSIONS = %w(0.9 11.4 11.10).freeze
 
     def self.all
       client.describe_stacks.data[:stacks].map do |hash|
@@ -100,7 +99,7 @@ module OpsWorks
     end
 
     def deploy_app(app, args = {})
-      fail 'App not found' unless app && app.id
+      raise 'App not found' unless app && app.id
       create_deployment(
         app_id: app.id,
         command: {
@@ -129,7 +128,8 @@ module OpsWorks
 
     def create_app(name, options = {})
       options = options.slice(:type, :shortname)
-      options.merge!(stack_id: id, name: name)
+      options[:stack_id] = id
+      options[:name] = name
       self.class.client.create_app(options)
     end
 
@@ -142,7 +142,6 @@ module OpsWorks
     end
 
     # rubocop:disable Eval
-    # rubocop:disable MethodLength
     def replace_hash_at_path(hash, key, value)
       path = JsonPath.new(key).path
       if !value.nil?
@@ -160,7 +159,6 @@ module OpsWorks
 
       hash
     end
-    # rubocop:enable MethodLength
     # rubocop:enable Eval
 
     def initialize_permissions
@@ -188,5 +186,4 @@ module OpsWorks
       Deployment.from_response(response)
     end
   end
-  # rubocop:enable ClassLength
 end

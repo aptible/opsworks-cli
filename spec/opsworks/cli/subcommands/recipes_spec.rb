@@ -3,7 +3,7 @@ require 'spec_helper'
 describe OpsWorks::CLI::Agent do
   context 'recipes' do
     let(:recipe) { 'hotpockets::install' }
-    let(:stacks) { 2.times.map { Fabricate(:stack) } }
+    let(:stacks) { Array.new(2) { Fabricate(:stack) } }
 
     before { allow(subject).to receive(:say) }
     before { allow(OpsWorks::Deployment).to receive(:wait) }

@@ -5,7 +5,6 @@ module OpsWorks
   class Layer < Resource
     attr_accessor :id, :name, :shortname, :custom_recipes
 
-    # rubocop:disable MethodLength
     def self.from_collection_response(response)
       response.data[:layers].map do |hash|
         # Make custom_recipes accessible by string or symbol
@@ -20,7 +19,6 @@ module OpsWorks
         )
       end
     end
-    # rubocop:enable MethodLength
 
     def add_custom_recipe(event, recipe)
       return if custom_recipes[event].include?(recipe)

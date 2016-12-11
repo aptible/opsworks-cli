@@ -3,7 +3,7 @@ require 'spec_helper'
 describe OpsWorks::CLI::Agent do
   context 'apps' do
     let(:app_name) { 'aptible' }
-    let(:stacks) { 2.times.map { Fabricate(:stack) } }
+    let(:stacks) { Array.new(2) { Fabricate(:stack) } }
 
     before { allow(subject).to receive(:say) }
     before { allow(OpsWorks::Deployment).to receive(:wait) }
@@ -80,7 +80,7 @@ describe OpsWorks::CLI::Agent do
       end
 
       it 'should fail with a helpful error on unsupported type' do
-        options.merge!(type: 'foobar')
+        options[:type] = 'foobar'
         allow(subject).to receive(:options) { options }
         expect { subject.send('apps:create', app_name) }.to raise_error
       end
@@ -95,7 +95,7 @@ describe OpsWorks::CLI::Agent do
       end
 
       it 'should accept a different shortname' do
-        options.merge!(shortname: 'foobar')
+        options[:shortname] = 'foobar'
         allow(subject).to receive(:options) { options }
         expect(stacks[0]).to receive(:create_app).with(app_name, options)
         expect(stacks[1]).to receive(:create_app).with(app_name, options)

@@ -4,9 +4,6 @@ module OpsWorks
   module CLI
     module Subcommands
       module Apps
-        # rubocop:disable MethodLength
-        # rubocop:disable CyclomaticComplexity
-        # rubocop:disable PerceivedComplexity
         def self.included(thor)
           thor.class_eval do
             desc 'apps:deploy APP [--stack STACK]', 'Deploy an OpsWorks app'
@@ -27,7 +24,7 @@ module OpsWorks
                 deployments.each_with_index do |deployment, i|
                   failures << stacks[i].name unless deployment.success?
                 end
-                fail "Deploy failed on #{failures.join(', ')}"
+                raise "Deploy failed on #{failures.join(', ')}"
               end
             end
 
@@ -57,10 +54,10 @@ module OpsWorks
             option :shortname
             define_method 'apps:create' do |name|
               unless %w(other).include?(options[:type])
-                fail "Unsupported type: #{options[:type]}"
+                raise "Unsupported type: #{options[:type]}"
               end
 
-              fail 'Git URL not yet supported' if options[:git_url]
+              raise 'Git URL not yet supported' if options[:git_url]
 
               stacks = parse_stacks(options)
               stacks.each do |stack|
@@ -77,9 +74,6 @@ module OpsWorks
             end
           end
         end
-        # rubocop:enable PerceivedComplexity
-        # rubocop:enable CyclomaticComplexity
-        # rubocop:enable MethodLength
       end
     end
   end

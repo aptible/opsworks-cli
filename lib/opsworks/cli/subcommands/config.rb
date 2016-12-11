@@ -5,8 +5,6 @@ module OpsWorks
   module CLI
     module Subcommands
       module Config
-        # rubocop:disable MethodLength
-        # rubocop:disable CyclomaticComplexity
         def self.included(thor)
           thor.class_eval do
             desc 'config:get KEY [--stack STACK]', 'Get a single config value'
@@ -40,8 +38,6 @@ module OpsWorks
             end
           end
         end
-        # rubocop:enable CyclomaticComplexity
-        # rubocop:enable MethodLength
       end
     end
   end

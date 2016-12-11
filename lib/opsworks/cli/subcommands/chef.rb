@@ -5,8 +5,6 @@ module OpsWorks
   module CLI
     module Subcommands
       module Chef
-        # rubocop:disable MethodLength
-        # rubocop:disable CyclomaticComplexity
         def self.included(thor)
           thor.class_eval do
             desc 'chef:configure [--stack STACK]', 'Configure Chef/Berkshelf'
@@ -42,13 +40,11 @@ module OpsWorks
                 deployments.each_with_index do |deployment, i|
                   failures << stacks[i].name unless deployment.success?
                 end
-                fail "Update failed on #{failures.join(', ')}"
+                raise "Update failed on #{failures.join(', ')}"
               end
             end
           end
         end
-        # rubocop:enable CyclomaticComplexity
-        # rubocop:enable MethodLength
       end
     end
   end
