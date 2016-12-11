@@ -14,12 +14,14 @@ Install the gem:
 
 ## Configuration
 
-The gem expects to have access to your AWS access key ID and secret access key. You can configure this in either of two ways. First, you may set the following environment variables:
+The gem expects to have access to your AWS access key ID and secret access key. You may set the following environment variables:
 
     export AWS_ACCESS_KEY_ID=...
     export AWS_SECRET_ACCESS_KEY=...
 
-Second (the preferred option), you may use the [Omnivault](https://github.com/aptible/omnivault) gem to store and configure your credentials automatically, via your choice of password-protected vault (Apple Keychain or pws).
+To avoid manually setting these ENV variables each time, you may use the [Omnivault](https://github.com/aptible/omnivault) gem to store and configure your credentials once, then access them later by running e.g.
+
+    omnivault exec opsworks [...]
 
 ## Usage
 
