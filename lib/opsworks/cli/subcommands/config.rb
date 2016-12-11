@@ -15,7 +15,7 @@ module OpsWorks
               fetch_credentials unless env_credentials?
               table = parse_stacks(options).map do |stack|
                 value = stack.custom_json_at(key)
-                [stack.name, value || '(null)']
+                [stack.name, value.nil? ? '(null)' : value]
               end
               table.compact!
               table.sort! { |x, y| x.first <=> y.first }
