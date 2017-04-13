@@ -29,6 +29,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'aptible-tasks'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec', '~> 3.0'
-  spec.add_development_dependency 'fabrication'
+  spec.add_development_dependency 'fabrication', '~> 2.16.0'
   spec.add_development_dependency 'pry'
 end
