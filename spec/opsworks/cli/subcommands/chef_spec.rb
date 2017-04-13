@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe OpsWorks::CLI::Agent do
   describe 'chef:sync' do
-    let(:stacks) { 2.times.map { Fabricate(:stack) } }
+    let(:stacks) { Array.new(2) { Fabricate(:stack) } }
     let(:deployment) { Fabricate(:deployment, status: 'successful') }
 
     before { allow(subject).to receive(:say) }

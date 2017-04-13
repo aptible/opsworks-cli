@@ -4,8 +4,6 @@ module OpsWorks
   module CLI
     module Subcommands
       module Recipes
-        # rubocop:disable MethodLength
-        # rubocop:disable CyclomaticComplexity
         def self.included(thor)
           thor.class_eval do
             desc 'recipes:run RECIPE [--stack STACK]', 'Execute a Chef recipe'
@@ -23,7 +21,7 @@ module OpsWorks
                 deployments.each_with_index do |deployment, i|
                   failures << stacks[i].name unless deployment.success?
                 end
-                fail "Command failed on #{failures.join(', ')}"
+                raise "Command failed on #{failures.join(', ')}"
               end
             end
 
@@ -58,8 +56,6 @@ module OpsWorks
             end
           end
         end
-        # rubocop:enable CyclomaticComplexity
-        # rubocop:enable MethodLength
       end
     end
   end

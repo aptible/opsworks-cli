@@ -69,7 +69,7 @@ module OpsWorks
               end.compact
 
               unless failures.empty?
-                fail "Deploy failed on #{failures.map(&:name).join(' ')}"
+                raise "Deploy failed on #{failures.map(&:name).join(' ')}"
               end
 
               say "All #{deployments.size} deployments suceeded"
