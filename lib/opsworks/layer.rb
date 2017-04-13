@@ -6,13 +6,15 @@ module OpsWorks
     attr_accessor :id, :name, :shortname, :custom_recipes
 
     # rubocop:disable MethodLength
-    def self.from_collection_response(response)
-      response.data[:layers].map do |hash|
+    def self.from_collection_response(client, response)
+      response.data[:layers].map do |layer|
+        hash = layer.to_h
         # Make custom_recipes accessible by string or symbol
         custom_recipes = Thor::CoreExt::HashWithIndifferentAccess.new(
           hash[:custom_recipes]
         )
         new(
+          client,
           id: hash[:layer_id],
           name: hash[:name],
           shortname: hash[:shortname],
@@ -27,7 +29,7 @@ module OpsWorks
 
       custom_recipes[event] ||= []
       custom_recipes[event].push recipe
-      self.class.client.update_layer(
+      client.update_layer(
         layer_id: id,
         custom_recipes: custom_recipes
       )
@@ -37,7 +39,7 @@ module OpsWorks
       return unless custom_recipes[event].include?(recipe)
 
       custom_recipes[event].delete recipe
-      self.class.client.update_layer(
+      client.update_layer(
         layer_id: id,
         custom_recipes: custom_recipes
       )
