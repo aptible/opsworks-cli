@@ -6,9 +6,9 @@ require 'opsworks/cli'
 
 require 'fabrication'
 
-RSpec.configure do |config|
-  config.before do
-    allow(AWS::OpsWorks::Client).to receive(:new) { double.as_null_object }
-    allow(AWS).to receive(:config)
-  end
+def opsworks_stub
+  Aws::OpsWorks::Client.new(stub_responses: true)
+end
+
+RSpec.configure do |_config|
 end

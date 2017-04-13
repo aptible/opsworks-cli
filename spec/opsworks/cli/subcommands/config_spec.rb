@@ -5,11 +5,9 @@ describe OpsWorks::CLI::Agent do
     let(:custom_json) { { 'env' => { 'FOO' => 'bar' } } }
     let(:json_path) { 'env.FOO' }
     let(:stack) { Fabricate(:stack, custom_json: custom_json) }
-    let(:client) { double.as_null_object }
 
     before { allow(subject).to receive(:say) }
-    before { allow(OpsWorks::Stack).to receive(:all) { [stack] } }
-    before { allow(OpsWorks::Stack).to receive(:client) { client } }
+    before { allow(subject).to receive(:parse_stacks).and_return([stack]) }
 
     describe 'config:get' do
       it 'should print the variable from the stack custom JSON' do
@@ -30,7 +28,7 @@ describe OpsWorks::CLI::Agent do
 
     describe 'config:set' do
       it 'should reset the variable, if it is already set' do
-        expect(client).to receive(:update_stack) do |hash|
+        expect(stack.client).to receive(:update_stack) do |hash|
           json = JSON.parse(hash[:custom_json])
           expect(json['env']['FOO']).to eq 'baz'
         end
@@ -40,7 +38,7 @@ describe OpsWorks::CLI::Agent do
 
       it 'should work with deep nested hashes' do
         stack.custom_json = { 'app' => { 'var' => 'value' } }
-        expect(client).to receive(:update_stack) do |hash|
+        expect(stack.client).to receive(:update_stack) do |hash|
           json = JSON.parse(hash[:custom_json])
           expect(json['app']['env']['FOO']).to eq 'baz'
         end
@@ -50,7 +48,7 @@ describe OpsWorks::CLI::Agent do
 
       it 'should set the variable, if it is unset' do
         stack.custom_json = {}
-        expect(client).to receive(:update_stack) do |hash|
+        expect(stack.client).to receive(:update_stack) do |hash|
           json = JSON.parse(hash[:custom_json])
           expect(json['env']['FOO']).to eq 'baz'
         end
@@ -60,7 +58,7 @@ describe OpsWorks::CLI::Agent do
 
       it 'should leave other variables alone' do
         stack.custom_json.merge!('other' => 'something')
-        expect(client).to receive(:update_stack) do |hash|
+        expect(stack.client).to receive(:update_stack) do |hash|
           json = JSON.parse(hash[:custom_json])
           expect(json['env']['FOO']).to eq 'baz'
           expect(json['other']).to eq 'something'
@@ -72,7 +70,7 @@ describe OpsWorks::CLI::Agent do
 
       it 'should typecast Boolean values' do
         stack.custom_json = {}
-        expect(client).to receive(:update_stack) do |hash|
+        expect(stack.client).to receive(:update_stack) do |hash|
           json = JSON.parse(hash[:custom_json])
           expect(json['env']['FOO']).to eq true
         end
@@ -83,7 +81,7 @@ describe OpsWorks::CLI::Agent do
 
     describe 'config:unset' do
       it 'should unset the variable' do
-        expect(client).to receive(:update_stack) do |hash|
+        expect(stack.client).to receive(:update_stack) do |hash|
           json = JSON.parse(hash[:custom_json])
           expect(json['env'].keys).not_to include('FOO')
         end
@@ -93,7 +91,7 @@ describe OpsWorks::CLI::Agent do
 
       it 'should leave other variables alone' do
         stack.custom_json['env'].merge!('OTHER' => 'something')
-        expect(client).to receive(:update_stack) do |hash|
+        expect(stack.client).to receive(:update_stack) do |hash|
           json = JSON.parse(hash[:custom_json])
           expect(json['env'].keys).not_to include('FOO')
         end
@@ -103,7 +101,7 @@ describe OpsWorks::CLI::Agent do
 
       it 'should work even with nil values' do
         stack.custom_json['env'] = { 'FOO' => nil }
-        expect(client).to receive(:update_stack) do |hash|
+        expect(stack.client).to receive(:update_stack) do |hash|
           json = JSON.parse(hash[:custom_json])
           expect(json['env'].keys).not_to include('FOO')
         end
