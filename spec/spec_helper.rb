@@ -4,6 +4,7 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 # Require library up front
 require 'opsworks/cli'
 
+require 'securerandom'
 require 'fabrication'
 
 def opsworks_stub
