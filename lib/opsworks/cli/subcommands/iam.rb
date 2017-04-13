@@ -14,7 +14,6 @@ module OpsWorks
             option :ssh, type: :boolean, default: true
             option :sudo, type: :boolean, default: true
             define_method 'iam:allow' do |user|
-              fetch_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
               stacks.each do |stack|
                 permission = stack.find_permission_by_user(user)
@@ -27,7 +26,6 @@ module OpsWorks
             desc 'iam:lockdown [--stack STACK]', 'Remove all stack permissions'
             option :stack, type: :array
             define_method 'iam:lockdown' do
-              fetch_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
               stacks.each do |stack|
                 say "Locking down #{stack.name}..."

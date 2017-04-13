@@ -1,7 +1,6 @@
 require 'thor'
 require 'aws'
 
-require_relative 'helpers/credentials'
 require_relative 'helpers/options'
 require_relative 'helpers/typecasts'
 
@@ -17,7 +16,6 @@ module OpsWorks
     class Agent < Thor
       include Thor::Actions
 
-      include Helpers::Credentials
       include Helpers::Options
       include Helpers::Typecasts
 

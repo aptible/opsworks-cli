@@ -20,7 +20,6 @@ module OpsWorks
             option :cookbook_username
             option :cookbook_password
             define_method 'chef:configure' do
-              fetch_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
               stacks.each do |stack|
                 say "Configuring Chef #{options[:version]} on #{stack.name}..."
@@ -32,7 +31,6 @@ module OpsWorks
             option :stack, type: :array
             option :timeout, type: :numeric, default: 300
             define_method 'chef:sync' do
-              fetch_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
               deployments = stacks.map do |stack|
                 say "Syncing #{stack.name}..."

@@ -15,7 +15,6 @@ module OpsWorks
             option :migrate, type: :boolean, default: false
             option :layer, type: :string
             define_method 'apps:deploy' do |name|
-              fetch_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
               deployments = stacks.map do |stack|
                 next unless (app = stack.find_app_by_name(name))
@@ -46,8 +45,6 @@ module OpsWorks
                  'Display the most recent deployment of an app'
             option :stack, type: :array
             define_method 'apps:status' do |name|
-              fetch_credentials unless env_credentials?
-
               table = parse_stacks(options).map do |stack|
                 next unless (app = stack.find_app_by_name(name))
                 if (deployment = app.last_deployment)
@@ -75,7 +72,6 @@ module OpsWorks
 
               fail 'Git URL not yet supported' if options[:git_url]
 
-              fetch_credentials unless env_credentials?
               stacks = parse_stacks(options)
 
               stacks.each do |stack|
@@ -89,7 +85,6 @@ module OpsWorks
                  'Set the revision for an app'
             option :stack, type: :array
             define_method 'apps:revision:update' do |app_name, revision|
-              fetch_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
               stacks.each do |stack|
                 next unless (app = stack.find_app_by_name(app_name))
