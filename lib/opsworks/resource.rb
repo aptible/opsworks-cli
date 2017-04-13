@@ -1,15 +1,13 @@
-require 'aws'
-
 module OpsWorks
   class Resource
-    def initialize(options = {})
+    attr_reader :client
+
+    def initialize(client, options = {})
+      @client = client
+
       options.each do |key, value|
         send("#{key}=", value) if respond_to?("#{key}=")
       end
-    end
-
-    def self.client
-      @client ||= AWS::OpsWorks::Client.new
     end
 
     def self.account

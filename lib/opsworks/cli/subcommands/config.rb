@@ -1,4 +1,3 @@
-require 'aws'
 require 'opsworks/stack'
 
 module OpsWorks

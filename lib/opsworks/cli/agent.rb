@@ -1,5 +1,4 @@
 require 'thor'
-require 'aws'
 
 require_relative 'helpers/options'
 require_relative 'helpers/typecasts'
