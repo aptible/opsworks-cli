@@ -36,15 +36,21 @@ module OpsWorks
               stacks = parse_stacks(options.merge(active: true))
               deployments = stacks.map do |stack|
                 say "Syncing #{stack.name}..."
-                stack.update_custom_cookbooks
-              end
-              OpsWorks::Deployment.wait(deployments, options[:timeout])
-              unless deployments.all?(&:success?)
-                failures = []
-                deployments.each_with_index do |deployment, i|
-                  failures << stacks[i].name unless deployment.success?
-                end
-                fail "Update failed on #{failures.join(', ')}"
+                dpl = stack.update_custom_cookbooks
+                next unless dpl
+                [stack, dpl]
+              end.compact
+
+              OpsWorks::Deployment.wait(deployments.map(&:last),
+                                        options[:timeout])
+
+              failures = deployments.map do |stack, deployment|
+                next if deployment.success?
+                stack
+              end.compact
+
+              unless failures.empty?
+                fail "Deploy failed on #{failures.map(&:name).join(', ')}"
               end
             end
           end

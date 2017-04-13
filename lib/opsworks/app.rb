@@ -6,7 +6,8 @@ module OpsWorks
     attr_accessor :id, :name, :revision
 
     def self.from_collection_response(response)
-      response.data[:apps].map do |hash|
+      response.data[:apps].map do |app|
+        hash = app.to_h
         revision = hash[:app_source][:revision] if hash[:app_source]
         new(id: hash[:app_id], name: hash[:name], revision: revision)
       end

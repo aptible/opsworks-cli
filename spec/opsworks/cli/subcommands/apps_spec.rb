@@ -46,9 +46,9 @@ describe OpsWorks::CLI::Agent do
 
       it 'should optionally run migrations' do
         expect(stacks[0]).to receive(:deploy_app)
-          .with(app, 'migrate' => ['true']) { success }
+          .with(app, args: { 'migrate' => ['true'] }, layer: nil) { success }
         expect(stacks[1]).to receive(:deploy_app)
-          .with(app, 'migrate' => ['true']) { success }
+          .with(app, args: { 'migrate' => ['true'] }, layer: nil) { success }
 
         allow(subject).to receive(:options) { { migrate: true } }
         subject.send('apps:deploy', app_name)

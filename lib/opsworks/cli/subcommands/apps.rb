@@ -13,22 +13,32 @@ module OpsWorks
             option :stack, type: :array
             option :timeout, type: :numeric, default: 300
             option :migrate, type: :boolean, default: false
+            option :layer, type: :string
             define_method 'apps:deploy' do |name|
               fetch_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
               deployments = stacks.map do |stack|
                 next unless (app = stack.find_app_by_name(name))
                 say "Deploying to #{stack.name}..."
-                stack.deploy_app(app, 'migrate' => [options[:migrate].to_s])
-              end
-              deployments.compact!
-              OpsWorks::Deployment.wait(deployments, options[:timeout])
-              unless deployments.all?(&:success?)
-                failures = []
-                deployments.each_with_index do |deployment, i|
-                  failures << stacks[i].name unless deployment.success?
-                end
-                fail "Deploy failed on #{failures.join(', ')}"
+                dpl = stack.deploy_app(
+                  app,
+                  layer: options[:layer],
+                  args: { 'migrate' => [options[:migrate].to_s] }
+                )
+                next unless dpl
+                [stack, dpl]
+              end.compact
+
+              OpsWorks::Deployment.wait(deployments.map(&:last),
+                                        options[:timeout])
+
+              failures = deployments.map do |stack, deployment|
+                next if deployment.success?
+                stack
+              end.compact
+
+              unless failures.empty?
+                fail "Deploy failed on #{failures.map(&:name).join(' ')}"
               end
             end
 
