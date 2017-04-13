@@ -4,8 +4,6 @@ module OpsWorks
   module CLI
     module Subcommands
       module IAM
-        # rubocop:disable MethodLength
-        # rubocop:disable CyclomaticComplexity
         def self.included(thor)
           thor.class_eval do
             desc 'iam:allow USER [--stack STACK]',
@@ -36,8 +34,6 @@ module OpsWorks
             end
           end
         end
-        # rubocop:enable CyclomaticComplexity
-        # rubocop:enable MethodLength
       end
     end
   end

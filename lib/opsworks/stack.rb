@@ -9,13 +9,12 @@ require 'opsworks/permission'
 require 'opsworks/layer'
 
 module OpsWorks
-  # rubocop:disable ClassLength
   class Stack < Resource
     attr_accessor :id, :name, :custom_json
 
-    AVAILABLE_CHEF_VERSIONS = %w(0.9 11.4 11.10)
+    AVAILABLE_CHEF_VERSIONS = %w(0.9 11.4 11.10).freeze
     DEPLOY_NO_INSTANCES_ERROR = 'Please provide at least an instance ID of ' \
-                                'one running instance'
+                                'one running instance'.freeze
 
     def self.all
       regions = Aws.partition('aws').regions.select do |region|
@@ -124,7 +123,7 @@ module OpsWorks
     end
 
     def deploy_app(app, layer: nil, args: {})
-      fail 'App not found' unless app && app.id
+      raise 'App not found' unless app && app.id
 
       deploy_args = {
         app_id: app.id,
@@ -136,7 +135,7 @@ module OpsWorks
 
       if layer
         layer = layers.find { |l| l.shortname == layer }
-        fail "Layer #{layer} not found" unless layer
+        raise "Layer #{layer} not found" unless layer
         deploy_args[:layer_ids] = [layer.id]
       end
 
@@ -161,15 +160,13 @@ module OpsWorks
     end
 
     def create_app(name, options = {})
-      options = options.slice(:type, :shortname)
-      options.merge!(stack_id: id, name: name)
+      options = options.slice(:type, :shortname).merge(stack_id: id, name: name)
       client.create_app(options)
     end
 
     private
 
     # rubocop:disable Eval
-    # rubocop:disable MethodLength
     def replace_hash_at_path(hash, key, value)
       path = JsonPath.new(key).path
       if !value.nil?
@@ -187,7 +184,6 @@ module OpsWorks
 
       hash
     end
-    # rubocop:enable MethodLength
     # rubocop:enable Eval
 
     def initialize_apps
@@ -230,5 +226,4 @@ module OpsWorks
       Deployment.from_response(client, response)
     end
   end
-  # rubocop:enable ClassLength
 end
