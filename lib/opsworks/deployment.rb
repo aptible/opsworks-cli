@@ -2,13 +2,12 @@ require 'opsworks/resource'
 
 module OpsWorks
   class Deployment < Resource
-    attr_accessor :id, :status, :created_at
+    attr_accessor :id, :command, :status, :created_at, :custom_json, :app_id
 
     TIMEOUT = 300
     POLL_INTERVAL = 5
     API_LIMIT = 25
 
-    # rubocop:disable MethodLength
     def self.wait(deployments, timeout = TIMEOUT)
       start_time = Time.now
       timeout ||= TIMEOUT
@@ -17,41 +16,40 @@ module OpsWorks
         sleep POLL_INTERVAL
         updates = []
         running_deployments = deployments.select(&:running?)
-        running_deployments.map(&:id).each_slice(API_LIMIT) do |slice|
-          response = client.describe_deployments(
-            deployment_ids: slice
-          )
-          updates += from_collection_response(response)
+        groups = running_deployments.group_by { |d| d.client.config.region }
+
+        groups.each do |region, region_deployments|
+          client = Aws::OpsWorks::Client.new(region: region)
+          region_deployments.map(&:id).each_slice(API_LIMIT) do |slice|
+            response = client.describe_deployments(deployment_ids: slice)
+            updates += from_collection_response(client, response)
+          end
         end
+
         running_deployments.each do |deployment|
           update = updates.find { |u| u.id == deployment.id }
           deployment.status = update.status
         end
       end
     end
-    # rubocop:enble MethodLength
 
-    def self.from_collection_response(response)
-      response.data[:deployments].map do |hash|
+    def self.from_collection_response(client, response)
+      response.data[:deployments].map do |deployment|
+        hash = deployment.to_h
         new(
+          client,
           id: hash[:deployment_id],
+          command: hash[:command],
           created_at: hash[:created_at],
-          status: hash[:status]
+          status: hash[:status],
+          custom_json: hash[:custom_json],
+          app_id: hash[:app_id]
         )
       end
     end
 
-    def self.from_response(response)
-      new(id: response[:deployment_id])
-    end
-
-    def wait
-      while deployment.running?
-        sleep POLL_INTERVAL
-        response = client.describe_deployments(deployment_ids: [id])
-        update = from_collection_response(response).first
-        deployment.status = update.status
-      end
+    def self.from_response(client, response)
+      new(client, id: response[:deployment_id])
     end
 
     def running?

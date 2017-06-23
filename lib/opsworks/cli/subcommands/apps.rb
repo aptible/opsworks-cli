@@ -4,31 +4,37 @@ module OpsWorks
   module CLI
     module Subcommands
       module Apps
-        # rubocop:disable MethodLength
-        # rubocop:disable CyclomaticComplexity
-        # rubocop:disable PerceivedComplexity
         def self.included(thor)
           thor.class_eval do
             desc 'apps:deploy APP [--stack STACK]', 'Deploy an OpsWorks app'
             option :stack, type: :array
             option :timeout, type: :numeric, default: 300
             option :migrate, type: :boolean, default: false
+            option :layer, type: :string
             define_method 'apps:deploy' do |name|
-              fetch_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
               deployments = stacks.map do |stack|
                 next unless (app = stack.find_app_by_name(name))
                 say "Deploying to #{stack.name}..."
-                stack.deploy_app(app, 'migrate' => [options[:migrate].to_s])
-              end
-              deployments.compact!
-              OpsWorks::Deployment.wait(deployments, options[:timeout])
-              unless deployments.all?(&:success?)
-                failures = []
-                deployments.each_with_index do |deployment, i|
-                  failures << stacks[i].name unless deployment.success?
-                end
-                fail "Deploy failed on #{failures.join(', ')}"
+                dpl = stack.deploy_app(
+                  app,
+                  layer: options[:layer],
+                  args: { 'migrate' => [options[:migrate].to_s] }
+                )
+                next unless dpl
+                [stack, dpl]
+              end.compact
+
+              OpsWorks::Deployment.wait(deployments.map(&:last),
+                                        options[:timeout])
+
+              failures = deployments.map do |stack, deployment|
+                next if deployment.success?
+                stack
+              end.compact
+
+              unless failures.empty?
+                raise "Deploy failed on #{failures.map(&:name).join(' ')}"
               end
             end
 
@@ -36,8 +42,6 @@ module OpsWorks
                  'Display the most recent deployment of an app'
             option :stack, type: :array
             define_method 'apps:status' do |name|
-              fetch_credentials unless env_credentials?
-
               table = parse_stacks(options).map do |stack|
                 next unless (app = stack.find_app_by_name(name))
                 if (deployment = app.last_deployment)
@@ -60,18 +64,29 @@ module OpsWorks
             option :shortname
             define_method 'apps:create' do |name|
               unless %w(other).include?(options[:type])
-                fail "Unsupported type: #{options[:type]}"
+                raise "Unsupported type: #{options[:type]}"
               end
 
-              fail 'Git URL not yet supported' if options[:git_url]
+              raise 'Git URL not yet supported' if options[:git_url]
 
-              fetch_credentials unless env_credentials?
               stacks = parse_stacks(options)
 
               stacks.each do |stack|
                 next if stack.apps.map(&:name).include?(name)
                 say "Creating app on #{stack.name}."
                 stack.create_app(name, options)
+              end
+            end
+
+            desc 'apps:revision:update APP REVISION [--stack STACK]',
+                 'Set the revision for an app'
+            option :stack, type: :array
+            define_method 'apps:revision:update' do |app_name, revision|
+              stacks = parse_stacks(options.merge(active: true))
+              stacks.each do |stack|
+                next unless (app = stack.find_app_by_name(app_name))
+                say "Updating #{stack.name} (from: #{app.revision})..."
+                app.update_revision(revision)
               end
             end
 
@@ -82,9 +97,6 @@ module OpsWorks
             end
           end
         end
-        # rubocop:enable PerceivedComplexity
-        # rubocop:enable CyclomaticComplexity
-        # rubocop:enable MethodLength
       end
     end
   end

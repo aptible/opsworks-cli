@@ -4,9 +4,10 @@ module OpsWorks
   class Instance < Resource
     attr_accessor :id, :hostname, :ec2_instance_id, :instance_type, :status
 
-    def self.from_collection_response(response)
+    def self.from_collection_response(client, response)
       response.data[:instances].map do |hash|
         new(
+          client,
           id: hash[:instance_id],
           hostname: hash[:hostname],
           ec2_instance_id: hash[:ec2_instance_id],

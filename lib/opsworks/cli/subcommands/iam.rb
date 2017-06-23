@@ -4,8 +4,6 @@ module OpsWorks
   module CLI
     module Subcommands
       module IAM
-        # rubocop:disable MethodLength
-        # rubocop:disable CyclomaticComplexity
         def self.included(thor)
           thor.class_eval do
             desc 'iam:allow USER [--stack STACK]',
@@ -14,7 +12,6 @@ module OpsWorks
             option :ssh, type: :boolean, default: true
             option :sudo, type: :boolean, default: true
             define_method 'iam:allow' do |user|
-              fetch_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
               stacks.each do |stack|
                 permission = stack.find_permission_by_user(user)
@@ -27,7 +24,6 @@ module OpsWorks
             desc 'iam:lockdown [--stack STACK]', 'Remove all stack permissions'
             option :stack, type: :array
             define_method 'iam:lockdown' do
-              fetch_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
               stacks.each do |stack|
                 say "Locking down #{stack.name}..."
@@ -38,8 +34,6 @@ module OpsWorks
             end
           end
         end
-        # rubocop:enable CyclomaticComplexity
-        # rubocop:enable MethodLength
       end
     end
   end

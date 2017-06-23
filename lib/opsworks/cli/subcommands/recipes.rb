@@ -4,15 +4,12 @@ module OpsWorks
   module CLI
     module Subcommands
       module Recipes
-        # rubocop:disable MethodLength
-        # rubocop:disable CyclomaticComplexity
         def self.included(thor)
           thor.class_eval do
             desc 'recipes:run RECIPE [--stack STACK]', 'Execute a Chef recipe'
             option :stack, type: :array
             option :timeout, type: :numeric, default: 300
             define_method 'recipes:run' do |recipe|
-              fetch_credentials unless env_credentials?
               stacks = parse_stacks(options.merge(active: true))
               deployments = stacks.map do |stack|
                 say "Executing recipe on #{stack.name}..."
@@ -24,7 +21,7 @@ module OpsWorks
                 deployments.each_with_index do |deployment, i|
                   failures << stacks[i].name unless deployment.success?
                 end
-                fail "Command failed on #{failures.join(', ')}"
+                raise "Command failed on #{failures.join(', ')}"
               end
             end
 
@@ -32,7 +29,6 @@ module OpsWorks
                  'Add a recipe to a given layer and lifecycle event'
             option :stack, type: :array
             define_method 'recipes:add' do |layername, event, recipe|
-              fetch_credentials unless env_credentials?
               stacks = parse_stacks(options)
               stacks.each do |stack|
                 layer = stack.layers.find { |l| l.shortname == layername }
@@ -48,7 +44,6 @@ module OpsWorks
                  'Remove a recipe from a given layer and lifecycle event'
             option :stack, type: :array
             define_method 'recipes:rm' do |layername, event, recipe|
-              fetch_credentials unless env_credentials?
               stacks = parse_stacks(options)
               stacks.each do |stack|
                 layer = stack.layers.find { |l| l.shortname == layername }
@@ -61,8 +56,6 @@ module OpsWorks
             end
           end
         end
-        # rubocop:enable CyclomaticComplexity
-        # rubocop:enable MethodLength
       end
     end
   end

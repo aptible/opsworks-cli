@@ -4,14 +4,12 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 # Require library up front
 require 'opsworks/cli'
 
+require 'securerandom'
 require 'fabrication'
-require 'omnivault'
 
-RSpec.configure do |config|
-  config.before do
-    allow(AWS::OpsWorks::Client).to receive(:new) { double.as_null_object }
-    allow(AWS).to receive(:config)
+def opsworks_stub
+  Aws::OpsWorks::Client.new(stub_responses: true)
+end
 
-    allow(Omnivault).to receive(:autodetect) { double.as_null_object }
-  end
+RSpec.configure do |_config|
 end

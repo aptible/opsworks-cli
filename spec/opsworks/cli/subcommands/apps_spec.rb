@@ -3,7 +3,7 @@ require 'spec_helper'
 describe OpsWorks::CLI::Agent do
   context 'apps' do
     let(:app_name) { 'aptible' }
-    let(:stacks) { 2.times.map { Fabricate(:stack) } }
+    let(:stacks) { Array.new(2) { Fabricate(:stack) } }
 
     before { allow(subject).to receive(:say) }
     before { allow(OpsWorks::Deployment).to receive(:wait) }
@@ -46,9 +46,9 @@ describe OpsWorks::CLI::Agent do
 
       it 'should optionally run migrations' do
         expect(stacks[0]).to receive(:deploy_app)
-          .with(app, 'migrate' => ['true']) { success }
+          .with(app, args: { 'migrate' => ['true'] }, layer: nil) { success }
         expect(stacks[1]).to receive(:deploy_app)
-          .with(app, 'migrate' => ['true']) { success }
+          .with(app, args: { 'migrate' => ['true'] }, layer: nil) { success }
 
         allow(subject).to receive(:options) { { migrate: true } }
         subject.send('apps:deploy', app_name)
@@ -80,7 +80,7 @@ describe OpsWorks::CLI::Agent do
       end
 
       it 'should fail with a helpful error on unsupported type' do
-        options.merge!(type: 'foobar')
+        options[:type] = 'foobar'
         allow(subject).to receive(:options) { options }
         expect { subject.send('apps:create', app_name) }.to raise_error
       end
@@ -95,11 +95,49 @@ describe OpsWorks::CLI::Agent do
       end
 
       it 'should accept a different shortname' do
-        options.merge!(shortname: 'foobar')
+        options[:shortname] = 'foobar'
         allow(subject).to receive(:options) { options }
         expect(stacks[0]).to receive(:create_app).with(app_name, options)
         expect(stacks[1]).to receive(:create_app).with(app_name, options)
         subject.send('apps:create', app_name)
+      end
+    end
+
+    describe 'apps:revision:update' do
+      let(:revision) { '123' }
+
+      before do
+        stacks.each do |stack|
+          app = Fabricate(:app, name: app_name)
+          allow(stack).to receive(:apps) { [app] }
+        end
+      end
+
+      it 'should update the app revision on all stacks' do
+        expect(stacks[0].apps[0]).to receive(:update_revision).with(revision)
+        expect(stacks[1].apps[0]).to receive(:update_revision).with(revision)
+        subject.send('apps:revision:update', app_name, revision)
+      end
+
+      it 'should only run on active stacks' do
+        allow(OpsWorks::Stack).to receive(:active) { [stacks[0]] }
+        expect(stacks[0].apps[0]).to receive(:update_revision).with(revision)
+        expect(stacks[1].apps[0]).not_to receive(:update_revision)
+        subject.send('apps:revision:update', app_name, revision)
+      end
+
+      it 'should optionally run on a subset of stacks' do
+        expect(stacks[0].apps[0]).to receive(:update_revision).with(revision)
+        expect(stacks[1].apps[0]).not_to receive(:update_revision)
+
+        allow(subject).to receive(:options) { { stack: [stacks[0].name] } }
+        subject.send('apps:revision:update', app_name, revision)
+      end
+
+      it 'should not fail if a stack does not have the app' do
+        allow(stacks[0]).to receive(:apps) { [] }
+        expect(stacks[1].apps[0]).to receive(:update_revision).with(revision)
+        subject.send('apps:revision:update', app_name, revision)
       end
     end
   end
