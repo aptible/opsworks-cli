@@ -16,7 +16,7 @@ module OpsWorks
               end
 
               will_retry = last_deployment.map do |stack, deployment|
-                if deployment.status != 'failed'
+                if deployment.status == 'successful'
                   say "Skipping stack #{stack.name}: last deployment is " \
                       "#{deployment.status}"
                   next
@@ -24,7 +24,7 @@ module OpsWorks
 
                 say "Loading instance status for #{stack.name}"
 
-                res = Deployment.client.describe_commands(
+                res = deployment.client.describe_commands(
                   deployment_id: deployment.id
                 )
 
