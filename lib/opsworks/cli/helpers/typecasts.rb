@@ -1,5 +1,3 @@
-require 'opsworks/stack'
-
 module OpsWorks
   module CLI
     module Helpers

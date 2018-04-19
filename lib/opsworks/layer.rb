@@ -1,6 +1,3 @@
-require 'opsworks/resource'
-require 'thor'
-
 module OpsWorks
   class Layer < Resource
     attr_accessor :id, :name, :shortname, :custom_recipes

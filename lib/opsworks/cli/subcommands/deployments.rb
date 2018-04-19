@@ -53,7 +53,7 @@ module OpsWorks
                 opts[:app_id] = dep.app_id if dep.app_id
                 opts[:custom_json] = dep.custom_json if dep.custom_json
 
-                new_deployment = stack.send(:create_deployment, opts)
+                new_deployment = stack.create_deployment(opts)
 
                 [stack, new_deployment]
               end
