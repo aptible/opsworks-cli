@@ -16,6 +16,11 @@ module OpsWorks
               end
 
               will_retry = last_deployment.map do |stack, deployment|
+                if deployment.nil?
+                  say "Skipping stack #{stack.name}: no deployment"
+                  next
+                end
+
                 if deployment.status == 'successful'
                   say "Skipping stack #{stack.name}: last deployment is " \
                       "#{deployment.status}"
