@@ -1,5 +1,3 @@
-require 'opsworks/resource'
-
 module OpsWorks
   class Deployment < Resource
     attr_accessor :id, :command, :status, :created_at, :custom_json, :app_id

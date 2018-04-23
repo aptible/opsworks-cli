@@ -1,5 +1,3 @@
-require 'opsworks/deployment'
-
 module OpsWorks
   module CLI
     module Subcommands

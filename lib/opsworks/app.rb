@@ -1,6 +1,3 @@
-require 'opsworks/resource'
-require 'opsworks/deployment'
-
 module OpsWorks
   class App < Resource
     attr_accessor :id, :name, :revision

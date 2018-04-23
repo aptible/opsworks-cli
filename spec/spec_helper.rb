@@ -6,6 +6,7 @@ require 'opsworks/cli'
 
 require 'securerandom'
 require 'fabrication'
+require 'timecop'
 
 def opsworks_stub
   Aws::OpsWorks::Client.new(stub_responses: true)

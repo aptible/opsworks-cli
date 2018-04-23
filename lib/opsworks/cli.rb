@@ -1,3 +1,4 @@
+require 'opsworks'
 require 'opsworks/cli/version'
 require 'opsworks/cli/agent'
 

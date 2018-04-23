@@ -1,5 +1,3 @@
-require 'opsworks/resource'
-
 module OpsWorks
   class Permission < Resource
     attr_accessor :id, :stack_id, :iam_user_arn, :ssh, :sudo

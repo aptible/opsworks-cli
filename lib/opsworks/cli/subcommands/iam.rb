@@ -1,5 +1,3 @@
-require 'opsworks/permission'
-
 module OpsWorks
   module CLI
     module Subcommands

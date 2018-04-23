@@ -1,13 +1,3 @@
-require 'jsonpath'
-require 'aws-sdk'
-require 'active_support/core_ext/hash/slice'
-
-require 'opsworks/resource'
-require 'opsworks/app'
-require 'opsworks/instance'
-require 'opsworks/permission'
-require 'opsworks/layer'
-
 module OpsWorks
   class Stack < Resource
     attr_accessor :id, :name, :custom_json
@@ -142,6 +132,16 @@ module OpsWorks
       create_deployment(**deploy_args)
     end
 
+    def create_deployment(options = {})
+      response = client.create_deployment(
+        options.merge(stack_id: id)
+      )
+    rescue Aws::OpsWorks::Errors::ValidationException => e
+      raise unless e.message == DEPLOY_NO_INSTANCES_ERROR
+    else
+      Deployment.from_response(client, response)
+    end
+
     def active?
       instances.any?(&:online?)
     end
@@ -162,6 +162,13 @@ module OpsWorks
     def create_app(name, options = {})
       options = options.slice(:type, :shortname).merge(stack_id: id, name: name)
       client.create_app(options)
+    end
+
+    def settled?
+      instances = initialize_instances
+      fatal = instances.select(&:fatal?)
+      raise Errors::StackInFatalState.new(self, fatal) if fatal.any?
+      instances.all?(&:settled?)
     end
 
     private
@@ -214,16 +221,6 @@ module OpsWorks
       return [] unless id
       response = client.describe_deployments(stack_id: id)
       Deployment.from_collection_response(client, response)
-    end
-
-    def create_deployment(options = {})
-      response = client.create_deployment(
-        options.merge(stack_id: id)
-      )
-    rescue Aws::OpsWorks::Errors::ValidationException => e
-      raise unless e.message == DEPLOY_NO_INSTANCES_ERROR
-    else
-      Deployment.from_response(client, response)
     end
   end
 end
