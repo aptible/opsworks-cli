@@ -103,13 +103,17 @@ module OpsWorks
       create_deployment(command: { name: 'update_custom_cookbooks' })
     end
 
-    def execute_recipe(recipe)
-      create_deployment(
+    def execute_recipe(recipe, layer: nil)
+      deploy_args = {
         command: {
           name: 'execute_recipes',
           args: { 'recipes' => [recipe] }
         }
-      )
+      }
+
+      deploy_args[:layer_ids] = [layer_id_from_name(layer)] if layer
+
+      create_deployment(**deploy_args)
     end
 
     def deploy_app(app, layer: nil, args: {})
@@ -123,11 +127,7 @@ module OpsWorks
         }
       }
 
-      if layer
-        layer = layers.find { |l| l.shortname == layer }
-        raise "Layer #{layer} not found" unless layer
-        deploy_args[:layer_ids] = [layer.id]
-      end
+      deploy_args[:layer_ids] = [layer_id_from_name(layer)] if layer
 
       create_deployment(**deploy_args)
     end
@@ -192,6 +192,12 @@ module OpsWorks
       hash
     end
     # rubocop:enable Eval
+
+    def layer_id_from_name(shortname)
+      layer = layers.find { |l| l.shortname == shortname }
+      raise "Layer #{layer} not found" unless layer
+      layer.id
+    end
 
     def initialize_apps
       return [] unless id
