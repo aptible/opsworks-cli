@@ -1,6 +1,7 @@
 module OpsWorks
   class Instance < Resource
-    attr_accessor :id, :hostname, :ec2_instance_id, :instance_type, :status
+    attr_accessor :id, :hostname, :ec2_instance_id, :instance_type, :status,
+                  :service_errors
 
     FATAL_STATUSES = %w(
       connection_lost setup_failed start_failed stop_failed
@@ -12,13 +13,24 @@ module OpsWorks
 
     def self.from_collection_response(client, response)
       response.data[:instances].map do |hash|
+        # If instance is in start_failed status, grab the service errors to
+        # help explain why
+        if hash[:status] == 'start_failed'
+          instance_id = hash[:instance_id]
+          raw = client.describe_service_errors(instance_id: instance_id)
+          service_errors = raw[:service_errors].map { |e| e[:message] }
+        else
+          service_errors = []
+        end
+
         new(
           client,
           id: hash[:instance_id],
           hostname: hash[:hostname],
           ec2_instance_id: hash[:ec2_instance_id],
           instance_type: hash[:instance_type],
-          status: hash[:status]
+          status: hash[:status],
+          service_errors: service_errors
         )
       end
     end

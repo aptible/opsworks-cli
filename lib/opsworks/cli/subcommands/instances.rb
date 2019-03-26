@@ -11,11 +11,16 @@ module OpsWorks
               stacks = parse_stacks(options)
               stacks.each do |stack|
                 stack.instances.each do |instance|
-                  say [
+                  arr = [
                     stack.name,
                     instance.hostname,
                     instance.status
-                  ].join("\t")
+                  ]
+                  # TODO: Why does a EOL tab break say?
+                  if (errors = instance.service_errors).any?
+                    arr << errors.join(', ')
+                  end
+                  say arr.join("\t")
                 end
               end
             end
