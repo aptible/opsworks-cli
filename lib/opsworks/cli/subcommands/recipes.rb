@@ -7,11 +7,12 @@ module OpsWorks
             desc 'recipes:run RECIPE [--stack STACK]', 'Execute a Chef recipe'
             option :stack, type: :array
             option :timeout, type: :numeric, default: 300
+            option :layer, type: :string
             define_method 'recipes:run' do |recipe|
               stacks = parse_stacks(options.merge(active: true))
               deployments = stacks.map do |stack|
                 say "Executing recipe on #{stack.name}..."
-                stack.execute_recipe(recipe)
+                stack.execute_recipe(recipe, layer: options[:layer])
               end
               OpsWorks::Deployment.wait(deployments, options[:timeout])
               unless deployments.all?(&:success?)

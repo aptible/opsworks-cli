@@ -13,23 +13,33 @@ describe OpsWorks::CLI::Agent do
     describe 'recipes:run' do
       let(:success) { Fabricate(:deployment, status: 'successful') }
       let(:failure) { Fabricate(:deployment, status: 'failed') }
+      let(:args) { [recipe, { layer: nil }] }
 
       it 'should update custom cookbooks on all stacks' do
-        expect(stacks[0]).to receive(:execute_recipe).with(recipe) { success }
-        expect(stacks[1]).to receive(:execute_recipe).with(recipe) { success }
+        expect(stacks[0]).to receive(:execute_recipe).with(*args) { success }
+        expect(stacks[1]).to receive(:execute_recipe).with(*args) { success }
         subject.send('recipes:run', recipe)
       end
 
       it 'should optionally run on a subset of stacks' do
-        expect(stacks[0]).to receive(:execute_recipe).with(recipe) { success }
+        expect(stacks[0]).to receive(:execute_recipe).with(*args) { success }
         expect(stacks[1]).not_to receive(:execute_recipe)
 
         allow(subject).to receive(:options) { { stack: [stacks[0].name] } }
         subject.send('recipes:run', recipe)
       end
 
+      it 'should optionally run on a single layer' do
+        args = [recipe, { layer: 'git' }]
+        expect(stacks[0]).to receive(:execute_recipe).with(*args) { success }
+        expect(stacks[1]).to receive(:execute_recipe).with(*args) { success }
+
+        allow(subject).to receive(:options) { { layer: 'git' } }
+        subject.send('recipes:run', recipe)
+      end
+
       it 'should fail if any update fails' do
-        expect(stacks[0]).to receive(:execute_recipe).with(recipe) { failure }
+        expect(stacks[0]).to receive(:execute_recipe).with(*args) { failure }
 
         allow(subject).to receive(:options) { { stack: [stacks[0].name] } }
         expect { subject.send('recipes:run', recipe) }.to raise_error
