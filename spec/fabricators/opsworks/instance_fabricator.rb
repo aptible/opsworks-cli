@@ -3,4 +3,5 @@ Fabricator(:instance, from: OpsWorks::Instance) do
   id { SecureRandom.uuid }
   hostname { Fabricate.sequence { |i| "test-instance#{i}" } }
   status { 'online' }
+  service_errors { [] }
 end
