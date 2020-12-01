@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'jsonpath', '1.0.5'
   spec.add_dependency 'thor'
 
-  spec.add_development_dependency 'aptible-tasks'
+  spec.add_development_dependency 'aptible-tasks', '~> 0.5.9'
   spec.add_development_dependency 'bundler', '~> 1.17.3'
   spec.add_development_dependency 'fabrication', '~> 2.16.0'
   spec.add_development_dependency 'pry'
