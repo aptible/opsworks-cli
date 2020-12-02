@@ -1,4 +1,5 @@
 # encoding: utf-8
+
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
@@ -20,16 +21,16 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^spec/})
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'thor'
-  spec.add_dependency 'aws-sdk', '~> 2.11.192'
-  spec.add_dependency 'jsonpath'
   spec.add_dependency 'activesupport'
+  spec.add_dependency 'aws-sdk-opsworks', '~> 1.30.0'
+  spec.add_dependency 'jsonpath', '1.0.5'
+  spec.add_dependency 'thor'
 
-  spec.add_development_dependency 'bundler', '~> 1.5'
-  spec.add_development_dependency 'aptible-tasks'
-  spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'rspec', '~> 3.0'
+  spec.add_development_dependency 'aptible-tasks', '~> 0.5.9'
+  spec.add_development_dependency 'bundler', '~> 1.17.3'
   spec.add_development_dependency 'fabrication', '~> 2.16.0'
   spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'rake'
+  spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'timecop', '~> 0.9'
 end

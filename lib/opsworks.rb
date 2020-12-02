@@ -1,6 +1,6 @@
 require 'thor'
 require 'jsonpath'
-require 'aws-sdk'
+require 'aws-sdk-opsworks'
 require 'active_support/core_ext/hash/slice'
 
 require 'opsworks/errors'
